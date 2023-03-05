@@ -4,6 +4,7 @@ import { ethers } from "ethers"
 import dotenv from "dotenv"
 
 import Loop from "./lib/loop.js"
+import logger from "./lib/logger.js"
 
 import Consensus from "./lib/strategies/consensus.js"
 
@@ -24,6 +25,7 @@ const signer = wallet.connect(provider)
 const contract = new ethers.Contract(PANCAKESWAP_ADDR, PANCAKESWAP_ABI, signer)
 
 const loop = Loop(contract, signer)
+loop.addObserver(logger)
 
 process.on("SIGINT", () => {
   console.log("Received SIGINT")
@@ -32,4 +34,5 @@ process.on("SIGINT", () => {
 
 loop.useStrategy(Consensus(contract, BET_AMOUNT))
 
+console.log("Running...")
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
