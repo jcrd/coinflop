@@ -5,6 +5,7 @@ import dotenv from "dotenv"
 
 import Loop from "./lib/loop.js"
 import logger from "./lib/logger.js"
+import history from "./lib/history.js"
 
 import Consensus from "./lib/strategies/consensus.js"
 
@@ -26,6 +27,7 @@ const contract = new ethers.Contract(PANCAKESWAP_ADDR, PANCAKESWAP_ABI, signer)
 
 const loop = Loop(contract, signer)
 loop.addObserver(logger)
+loop.addObserver(history)
 
 process.on("SIGINT", () => {
   console.log("Received SIGINT")
