@@ -34,7 +34,7 @@ process.on("SIGINT", () => {
   loop.abort()
 })
 
-loop.useStrategy(Consensus(contract, BET_AMOUNT))
+loop.useStrategy(Consensus(BET_AMOUNT))
 
 console.log("Running...")
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
