@@ -7,7 +7,7 @@ import Loop from "./lib/loop.js"
 import logger from "./lib/logger.js"
 import history from "./lib/history.js"
 
-import Consensus from "./lib/strategies/consensus.js"
+import strategies from "./lib/strategies/index.js"
 
 const PANCAKESWAP_ADDR = "0x18B2A687610328590Bc8F2e5fEdDe3b582A49cdA"
 const PANCAKESWAP_ABI = createRequire(import.meta.url)("./abi/pancakeswap.json")
@@ -17,6 +17,11 @@ const BET_WINDOW = {
   BEFORE_ROUND_LOCK: 10,
 }
 const BET_AMOUNT = "0.1"
+
+function getStrategy() {
+  const arg = process.argv[2]
+  return strategies[arg] || strategies["consensus"]
+}
 
 dotenv.config()
 
@@ -34,7 +39,7 @@ process.on("SIGINT", () => {
   loop.abort()
 })
 
-loop.useStrategy(Consensus(BET_AMOUNT))
+loop.useStrategy(getStrategy()(BET_AMOUNT))
 
 console.log("Running...")
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
