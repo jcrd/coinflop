@@ -31,8 +31,8 @@ const signer = wallet.connect(provider)
 const contract = new ethers.Contract(PANCAKESWAP_ADDR, PANCAKESWAP_ABI, signer)
 
 const loop = Loop(contract, signer)
-loop.addObserver(logger)
 loop.addObserver(history)
+loop.addObserver(logger)
 
 process.on("SIGINT", () => {
   console.log("Received SIGINT")
