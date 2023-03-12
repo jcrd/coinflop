@@ -39,7 +39,8 @@ process.on("SIGINT", () => {
   loop.abort()
 })
 
-loop.useStrategy(getStrategy()(BET_AMOUNT))
+const strategy = getStrategy()
+loop.useStrategy(new strategy(BET_AMOUNT))
 
 console.log("Running...")
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
