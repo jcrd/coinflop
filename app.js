@@ -4,6 +4,7 @@ import Contract from "./lib/contract.js"
 import Loop from "./lib/loop.js"
 import logger from "./lib/logger.js"
 import history from "./lib/history.js"
+import runServer from "./lib/server.js"
 
 import strategies from "./lib/strategies/index.js"
 
@@ -29,13 +30,16 @@ const loop = Loop(contract, signerAddress)
 loop.addObserver(history)
 loop.addObserver(logger)
 
+const strategy = getStrategy()
+loop.useStrategy(new strategy(BET_AMOUNT))
+
 process.on("SIGINT", () => {
   console.log("Received SIGINT")
   loop.abort()
 })
 
-const strategy = getStrategy()
-loop.useStrategy(new strategy(BET_AMOUNT))
-
 console.log("Running...")
+
+const stopServer = runServer(loop)
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
+stopServer()
