@@ -36,7 +36,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex">
-      <Chart history={history1m} />
+      <Chart interval={1} history={history1m} />
     </div>
   )
 }
