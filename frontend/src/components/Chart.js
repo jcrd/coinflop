@@ -22,6 +22,9 @@ const Chart = ({ interval, history }) => {
   const [stochRSID, setStochRSID] = useState([])
   const [stochRSIPass, setStochRSIPass] = useState([])
 
+  const [candleAxis, setCandleAxis] = useState([])
+  const [candleData, setCandleData] = useState([])
+
   const StochRSIChart = () => {
     const kColor = "#a899df"
     const dColor = "#2fc3eb"
@@ -80,14 +83,32 @@ const Chart = ({ interval, history }) => {
         d: setStochRSID,
         pass: setStochRSIPass,
       },
+      candle: {
+        axis: setCandleAxis,
+        data: setCandleData,
+      },
     }
+
     for (const type in setState) {
       for (const name in setState[type]) {
         setState[type][name]([])
       }
     }
+
     history.forEach((v) => {
       const date = new Date(v.closeTime)
+
+      setCandleAxis((prev) => prev.concat(date))
+      setCandleData((prev) =>
+        prev.concat({
+          x: date,
+          open: parseFloat(v.ohlc.open),
+          high: parseFloat(v.ohlc.high),
+          low: parseFloat(v.ohlc.low),
+          close: parseFloat(v.ohlc.close),
+        })
+      )
+
       if (v.interval === 1) {
         const bb = v.criteria.bbands
         for (const name in bb.values) {
@@ -129,7 +150,7 @@ const Chart = ({ interval, history }) => {
     <div className="flex flex-col">
       <VictoryChart theme={VictoryTheme.material} scale={{ x: "time" }}>
         <VictoryAxis
-          tickValues={history.map((v) => new Date(v.closeTime))}
+          tickValues={candleAxis}
           tickFormat={(d) => {
             try {
               return `${d.getHours()}:${String(d.getMinutes()).padStart(
@@ -168,18 +189,7 @@ const Chart = ({ interval, history }) => {
           style={{ data: { fill: "#c43a31" } }}
           size={0.5}
         />
-        <VictoryCandlestick
-          data={history.map((v) => {
-            const d = {
-              x: new Date(v.closeTime),
-              open: parseFloat(v.ohlc.open),
-              high: parseFloat(v.ohlc.high),
-              low: parseFloat(v.ohlc.low),
-              close: parseFloat(v.ohlc.close),
-            }
-            return d
-          })}
-        />
+        <VictoryCandlestick data={candleData} />
       </VictoryChart>
       <StochRSIChart />
     </div>
