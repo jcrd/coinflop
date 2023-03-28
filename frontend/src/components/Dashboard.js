@@ -22,15 +22,16 @@ const Dashboard = () => {
 
     if (lastMessage !== null) {
       // Sort messages by interval for appropriate chart.
-      const data = lastMessage.data
-      const json = JSON.parse(data)
-      const setHist = history[Number(json.interval)]
-      setHist((prev) => {
-        if (prev.length === maxHistoryLength) {
-          prev.shift()
-        }
-        return prev.concat(json)
-      })
+      const data = JSON.parse(lastMessage.data)
+      for (const json of data) {
+        const setHist = history[Number(json.interval)]
+        setHist((prev) => {
+          if (prev.length === maxHistoryLength) {
+            prev.shift()
+          }
+          return prev.concat(json)
+        })
+      }
     }
   }, [lastMessage])
 
