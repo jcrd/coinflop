@@ -25,6 +25,8 @@ const Chart = ({ interval, history }) => {
   const [candleAxis, setCandleAxis] = useState([])
   const [candleData, setCandleData] = useState([])
 
+  const [hmaData, setHMAData] = useState([])
+
   const StochRSIChart = () => {
     const kColor = "#a899df"
     const dColor = "#2fc3eb"
@@ -83,6 +85,9 @@ const Chart = ({ interval, history }) => {
         d: setStochRSID,
         pass: setStochRSIPass,
       },
+      hma: {
+        data: setHMAData,
+      },
       candle: {
         axis: setCandleAxis,
         data: setCandleData,
@@ -108,6 +113,16 @@ const Chart = ({ interval, history }) => {
           close: parseFloat(v.ohlc.close),
         })
       )
+
+      const hma = v.criteria.hma
+      if ("hma" in hma.values) {
+        setState.hma.data((prev) =>
+          prev.concat({
+            x: date,
+            y: parseFloat(hma.values.hma),
+          })
+        )
+      }
 
       if (v.interval === 1) {
         const bb = v.criteria.bbands
@@ -168,6 +183,11 @@ const Chart = ({ interval, history }) => {
           }
         />
         <VictoryAxis dependentAxis />
+        <VictoryLine
+          data={hmaData}
+          interpolation="natural"
+          style={{ data: { stroke: "#89723a", strokeWidth: 0.5 } }}
+        />
         <VictoryLine
           data={bbandLower}
           interpolation="natural"
