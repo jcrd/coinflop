@@ -5,6 +5,8 @@ import Chart from "./Chart.js"
 
 const WS_URL = "ws://127.0.0.1:8000"
 
+const maxHistoryLength = 50
+
 const Dashboard = () => {
   const { lastMessage } = useWebSocket(WS_URL)
   const [history1m, setHistory1m] = useState([])
@@ -23,12 +25,17 @@ const Dashboard = () => {
       const data = lastMessage.data
       const json = JSON.parse(data)
       const setHist = history[Number(json.interval)]
-      setHist((prev) => prev.concat(json))
+      setHist((prev) => {
+        if (prev.length === maxHistoryLength) {
+          prev.shift()
+        }
+        return prev.concat(json)
+      })
     }
   }, [lastMessage, setHistory1m, setHistory3m, setHistory5m])
 
   return (
-    <div class="flex">
+    <div className="flex">
       <Chart history={history1m} />
     </div>
   )
