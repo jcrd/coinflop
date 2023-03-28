@@ -32,7 +32,7 @@ const Dashboard = () => {
         return prev.concat(json)
       })
     }
-  }, [lastMessage, setHistory1m, setHistory3m, setHistory5m])
+  }, [lastMessage])
 
   return (
     <div className="flex">

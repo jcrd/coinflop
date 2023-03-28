@@ -67,68 +67,63 @@ const Chart = ({ interval, history }) => {
   }
 
   useEffect(() => {
-    const bbands = {
-      lower: [],
-      middle: [],
-      upper: [],
-      close: [],
-      fail: [],
+    const setState = {
+      bbands: {
+        lower: setBbandLower,
+        middle: setBbandMiddle,
+        upper: setBbandUpper,
+        close: setBbandClose,
+        fail: setBbandFail,
+      },
+      stochRSI: {
+        k: setStochRSIK,
+        d: setStochRSID,
+        pass: setStochRSIPass,
+      },
     }
-    const stochRSI = {
-      k: [],
-      d: [],
-      pass: [],
+    for (const type in setState) {
+      for (const name in setState[type]) {
+        setState[type][name]([])
+      }
     }
     history.forEach((v) => {
       const date = new Date(v.closeTime)
       if (v.interval === 1) {
         const bb = v.criteria.bbands
         for (const name in bb.values) {
-          bbands[name] = bbands[name].concat({
+          const set = setState.bbands[name]
+          set((prev) =>
+            prev.concat({
+              x: date,
+              y: parseFloat(bb.values[name]),
+            })
+          )
+        }
+        const bbSet = bb.state ? setState.bbands.close : setState.bbands.fail
+        bbSet((prev) =>
+          prev.concat({
             x: date,
-            y: parseFloat(bb.values[name]),
+            y: parseFloat(v.ohlc.close),
           })
-        }
-        const point = {
-          x: date,
-          y: parseFloat(v.ohlc.close),
-        }
-        if (bb.state) {
-          bbands.close = bbands.close.concat(point)
-        } else {
-          bbands.fail = bbands.fail.concat(point)
-        }
+        )
         const rsi = v.criteria.stochRSI
         for (const name in rsi.values) {
-          stochRSI[name] = stochRSI[name].concat({
-            x: date,
-            y: parseFloat(rsi.values[name]),
-          })
+          const set = setState.stochRSI[name]
+          set((prev) =>
+            prev.concat({
+              x: date,
+              y: parseFloat(rsi.values[name]),
+            })
+          )
         }
         if (rsi.state) {
-          stochRSI.pass.push({ x: date, y: rsi.values.k })
+          setState.stochRSI.pass((prev) =>
+            prev.concat({ x: date, y: rsi.values.k })
+          )
         }
       }
     })
-    setBbandLower(bbands.lower)
-    setBbandMiddle(bbands.middle)
-    setBbandUpper(bbands.upper)
-    setBbandClose(bbands.close)
-    setBbandFail(bbands.fail)
-    setStochRSIK(stochRSI.k)
-    setStochRSID(stochRSI.d)
-    setStochRSIPass(stochRSI.pass)
-  }, [
-    history,
-    setBbandLower,
-    setBbandMiddle,
-    setBbandUpper,
-    setBbandClose,
-    setBbandFail,
-    setStochRSIK,
-    setStochRSID,
-    setStochRSIPass,
-  ])
+  }, [history])
 
   return (
     <div className="flex flex-col">
