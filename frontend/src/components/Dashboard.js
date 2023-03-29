@@ -36,8 +36,10 @@ const Dashboard = () => {
   }, [lastMessage])
 
   return (
-    <div className="flex">
+    <div className="grid grid-cols-3 h-screen">
       <Chart interval={1} history={history1m} />
+      <Chart interval={3} history={history3m} />
+      <Chart interval={5} history={history5m} />
     </div>
   )
 }
