@@ -18,7 +18,7 @@ function newDate(epoch) {
   }).format(date)
 }
 
-const Status = ({ data }) => {
+const Status = ({ data, logMessages }) => {
   const [bbands1m, setBbands1m] = useState(false)
   const [stochRSI1m, setStochRSI1m] = useState(false)
   const [hma1m, setHMA1m] = useState(false)
@@ -41,36 +41,43 @@ const Status = ({ data }) => {
   }, [data])
 
   return (
-    <div className="flex flex-col gap-y-6 bg-slate-500 pt-6">
-      <div>{newDate(timestampData)}</div>
-      <div>
-        <div className="flex flex-col gap-y-4">
-          <h1>1m</h1>
-          <div className="grid grid-cols-2">
-            <p className="p-1">bbands</p>
-            <StatusComponent status={bbands1m} />
-            <p className="p-1">stochRSI</p>
-            <StatusComponent status={stochRSI1m} />
-            <p className="p-1">HMA</p>
-            <StatusComponent status={hma1m} />
+    <div className="flex flex-col max-h-screen bg-slate-500 pt-6">
+      <div className="h-2/5 flex flex-col gap-y-6">
+        <div>{newDate(timestampData)}</div>
+        <div>
+          <div className="flex flex-col gap-y-4">
+            <h1>1m</h1>
+            <div className="grid grid-cols-2">
+              <p className="p-1">bbands</p>
+              <StatusComponent status={bbands1m} />
+              <p className="p-1">stochRSI</p>
+              <StatusComponent status={stochRSI1m} />
+              <p className="p-1">HMA</p>
+              <StatusComponent status={hma1m} />
+            </div>
+          </div>
+          <div className="flex flex-col gap-y-4">
+            <h1>3m</h1>
+            <div className="grid grid-cols-2">
+              <p className="p-1">HMA</p>{" "}
+              <StatusComponent name="hma" status={hma3m} />
+            </div>
+          </div>
+          <div className="flex flex-col gap-y-4">
+            <h1>5m</h1>
+            <div className="grid grid-cols-2">
+              <p className="p-1">HMA</p>
+              <StatusComponent name="hma" status={hma5m} />
+            </div>
           </div>
         </div>
-        <div className="flex flex-col gap-y-4">
-          <h1>3m</h1>
-          <div className="grid grid-cols-2">
-            <p className="p-1">HMA</p>{" "}
-            <StatusComponent name="hma" status={hma3m} />
-          </div>
-        </div>
-        <div className="flex flex-col gap-y-4">
-          <h1>5m</h1>
-          <div className="grid grid-cols-2">
-            <p className="p-1">HMA</p>
-            <StatusComponent name="hma" status={hma5m} />
-          </div>
-        </div>
+        <StatusComponent name="passing" status={passing} />
       </div>
-      <StatusComponent name="passing" status={passing} />
+      <ol className="h-3/5 overflow-y-scroll px-8">
+        {logMessages.map((msg) => (
+          <li>{msg}</li>
+        ))}
+      </ol>
     </div>
   )
 }

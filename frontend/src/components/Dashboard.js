@@ -31,71 +31,89 @@ const Dashboard = () => {
     },
   })
 
+  const [logMessages, setLogMessages] = useState([])
+
   useEffect(() => {
+    if (lastMessage === null) {
+      return
+    }
+
     const history = {
       1: setHistory1m,
       3: setHistory3m,
       5: setHistory5m,
     }
 
-    if (lastMessage !== null) {
-      const data = JSON.parse(lastMessage.data)
-      for (const json of data) {
-        const setHist = history[json.interval]
-
-        setHist((prev) => {
+    const data = JSON.parse(lastMessage.data)
+    for (const json of data) {
+      if ("logMessage" in json) {
+        setLogMessages((prev) => {
           if (prev.length === maxHistoryLength) {
             prev.shift()
           }
-          return prev.concat(json)
+          return prev.concat(json.logMessage)
         })
+        continue
+      }
 
-        if (json.interval === 1) {
-          console.log(json)
-          setStatusData((prev) => {
-            return {
-              ...prev,
-              passing: json.state,
-              timestamp: json.timestamp,
-              1: {
-                bbands: json.criteria.bbands.state,
-                stochRSI: json.criteria.stochRSI.state,
-                hma: json.criteria.hma.state,
-              },
-            }
-          })
+      const setHist = history[json.interval]
+
+      setHist((prev) => {
+        if (prev.length === maxHistoryLength) {
+          prev.shift()
         }
-        if (json.interval === 3) {
-          setStatusData((prev) => {
-            return {
-              ...prev,
-              passing: json.state,
-              timestamp: json.timestamp,
-              3: {
-                hma: json.criteria.hma.state,
-              },
-            }
-          })
-        }
-        if (json.interval === 5) {
-          setStatusData((prev) => {
-            return {
-              ...prev,
-              passing: json.state,
-              timestamp: json.timestamp,
-              5: {
-                hma: json.criteria.hma.state,
-              },
-            }
-          })
-        }
+        return prev.concat(json)
+      })
+
+      if (json.interval === 1) {
+        console.log(json)
+        setStatusData((prev) => {
+          return {
+            ...prev,
+            passing: json.state,
+            timestamp: json.timestamp,
+            1: {
+              bbands: json.criteria.bbands.state,
+              stochRSI: json.criteria.stochRSI.state,
+              hma: json.criteria.hma.state,
+            },
+          }
+        })
+      }
+      if (json.interval === 3) {
+        setStatusData((prev) => {
+          return {
+            ...prev,
+            passing: json.state,
+            timestamp: json.timestamp,
+            3: {
+              hma: json.criteria.hma.state,
+            },
+          }
+        })
+      }
+      if (json.interval === 5) {
+        setStatusData((prev) => {
+          return {
+            ...prev,
+            passing: json.state,
+            timestamp: json.timestamp,
+            5: {
+              hma: json.criteria.hma.state,
+            },
+          }
+        })
       }
     }
   }, [lastMessage])
 
   return (
     <div className="grid grid-cols-5 h-screen">
-      <Status className="col-span-1" data={statusData}></Status>
+      <Status
+        className="col-span-1"
+        data={statusData}
+        logMessages={logMessages}
+      ></Status>
       <div className="col-span-4 grid grid-cols-3 grid-rows-2 h-screen">
         <div className="flex flex-col pt-6">
           <h1 className="text-xl">1m</h1>
