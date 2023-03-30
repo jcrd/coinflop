@@ -71,7 +71,7 @@ const Dashboard = () => {
           return {
             ...prev,
             passing: json.state,
-            timestamp: json.timestamp,
+            timestamp: json.closeTime,
             1: {
               bbands: json.criteria.bbands.state,
               stochRSI: json.criteria.stochRSI.state,
@@ -85,7 +85,7 @@ const Dashboard = () => {
           return {
             ...prev,
             passing: json.state,
-            timestamp: json.timestamp,
+            timestamp: json.closeTime,
             3: {
               hma: json.criteria.hma.state,
             },
@@ -97,7 +97,7 @@ const Dashboard = () => {
           return {
             ...prev,
             passing: json.state,
-            timestamp: json.timestamp,
+            timestamp: json.closeTime,
             5: {
               hma: json.criteria.hma.state,
             },
