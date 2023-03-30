@@ -2,7 +2,7 @@ import dotenv from "dotenv"
 
 import Contract from "./lib/contract.js"
 import Loop from "./lib/loop.js"
-import logger from "./lib/logger.js"
+import Logger from "./lib/logger.js"
 import history from "./lib/history.js"
 import runServer from "./lib/server.js"
 
@@ -28,7 +28,7 @@ const { contract, signerAddress } = Contract(
 
 const loop = Loop(contract, signerAddress)
 loop.addObserver(history)
-loop.addObserver(logger)
+loop.addObserver(Logger())
 
 const strategy = getStrategy()
 loop.useStrategy(new strategy(BET_AMOUNT))
