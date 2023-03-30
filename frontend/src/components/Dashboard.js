@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react"
 import useWebSocket from "react-use-websocket"
 
-import Chart from "./Chart.js"
+import CandleChart from "./CandleChart.js"
+import LineChart from "./LineChart.js"
 import Status from "./Status.js"
 
 const WS_URL = "ws://127.0.0.1:8000"
@@ -91,9 +92,10 @@ const Dashboard = () => {
     <div className="grid grid-cols-5 h-screen">
       <Status className="col-span-1" data={statusData}></Status>
       <div className="col-span-4 grid grid-cols-3 grid-rows-2 h-screen">
-        <Chart interval={1} history={history1m} />
-        <Chart interval={3} history={history3m} />
-        <Chart interval={5} history={history5m} />
+        <CandleChart interval={1} history={history1m} />
+        <CandleChart interval={3} history={history3m} />
+        <CandleChart interval={5} history={history5m} />
+        <LineChart history={history1m} />
       </div>
     </div>
   )

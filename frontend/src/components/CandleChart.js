@@ -5,7 +5,6 @@ import {
   VictoryCandlestick,
   VictoryChart,
   VictoryLabel,
-  VictoryLegend,
   VictoryLine,
   VictoryScatter,
   VictoryTheme,
@@ -18,56 +17,10 @@ const Chart = ({ interval, history }) => {
   const [bbandClose, setBbandClose] = useState([])
   const [bbandFail, setBbandFail] = useState([])
 
-  const [stochRSIK, setStochRSIK] = useState([])
-  const [stochRSID, setStochRSID] = useState([])
-  const [stochRSIPass, setStochRSIPass] = useState([])
-
   const [candleAxis, setCandleAxis] = useState([])
   const [candleData, setCandleData] = useState([])
 
   const [hmaData, setHMAData] = useState([])
-
-  const StochRSIChart = () => {
-    const kColor = "#a899df"
-    const dColor = "#2fc3eb"
-    if (interval === 1) {
-      return (
-        <VictoryChart
-          theme={VictoryTheme.material}
-          scale={{ x: "time" }}
-          height={200}
-        >
-          <VictoryAxis
-            tickLabelComponent={
-              <VictoryLabel angle={-45} style={[{ fontSize: 8 }]} />
-            }
-          />
-          <VictoryAxis dependentAxis />
-          <VictoryLine
-            data={stochRSIK}
-            style={{ data: { stroke: kColor, strokeWidth: 0.5 } }}
-          />
-          <VictoryLine
-            data={stochRSID}
-            style={{ data: { stroke: dColor, strokeWidth: 0.5 } }}
-          />
-          <VictoryScatter data={stochRSIPass} />
-          <VictoryLegend
-            x={125}
-            centerTitle
-            orientation="horizontal"
-            gutter={20}
-            style={{ border: { stroke: "black" }, title: { fontSize: 4 } }}
-            data={[
-              { name: "k", symbol: { fill: kColor } },
-              { name: "d", symbol: { fill: dColor } },
-            ]}
-          />
-        </VictoryChart>
-      )
-    }
-    return null
-  }
 
   useEffect(() => {
     const setState = {
@@ -77,11 +30,6 @@ const Chart = ({ interval, history }) => {
         upper: setBbandUpper,
         close: setBbandClose,
         fail: setBbandFail,
-      },
-      stochRSI: {
-        k: setStochRSIK,
-        d: setStochRSID,
-        pass: setStochRSIPass,
       },
       hma: {
         data: setHMAData,
@@ -140,21 +88,6 @@ const Chart = ({ interval, history }) => {
             y: parseFloat(v.ohlc.close),
           })
         )
-        const rsi = v.criteria.stochRSI
-        for (const name in rsi.values) {
-          const set = setState.stochRSI[name]
-          set((prev) =>
-            prev.concat({
-              x: date,
-              y: parseFloat(rsi.values[name]),
-            })
-          )
-        }
-        if (rsi.state) {
-          setState.stochRSI.pass((prev) =>
-            prev.concat({ x: date, y: rsi.values.k })
-          )
-        }
       }
     })
   }, [history])
@@ -210,7 +143,6 @@ const Chart = ({ interval, history }) => {
         />
         <VictoryCandlestick data={candleData} />
       </VictoryChart>
-      <StochRSIChart />
     </div>
   )
 }
