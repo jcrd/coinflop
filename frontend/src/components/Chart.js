@@ -45,12 +45,10 @@ const Chart = ({ interval, history }) => {
           <VictoryAxis dependentAxis />
           <VictoryLine
             data={stochRSIK}
-            interpolation="natural"
             style={{ data: { stroke: kColor, strokeWidth: 0.5 } }}
           />
           <VictoryLine
             data={stochRSID}
-            interpolation="natural"
             style={{ data: { stroke: dColor, strokeWidth: 0.5 } }}
           />
           <VictoryScatter data={stochRSIPass} />
