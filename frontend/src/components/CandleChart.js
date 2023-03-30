@@ -16,7 +16,6 @@ const Chart = ({ history }) => {
   const [bbandMiddle, setBbandMiddle] = useState([])
   const [bbandUpper, setBbandUpper] = useState([])
   const [bbandClose, setBbandClose] = useState([])
-  const [bbandFail, setBbandFail] = useState([])
 
   const [axisValues, setAxisValues] = useState([])
   const [candleData, setCandleData] = useState([])
@@ -29,8 +28,6 @@ const Chart = ({ history }) => {
         lower: setBbandLower,
         middle: setBbandMiddle,
         upper: setBbandUpper,
-        close: setBbandClose,
-        fail: setBbandFail,
       },
       hma: {
         data: setHMAData,
@@ -78,8 +75,7 @@ const Chart = ({ history }) => {
             })
           )
         }
-        const bbSet = bb.state ? setState.bbands.close : setState.bbands.fail
-        bbSet((prev) =>
+        setBbandClose((prev) =>
           prev.concat({
             x: date,
             y: parseFloat(v.ohlc.close),
@@ -114,11 +110,6 @@ const Chart = ({ history }) => {
         style={{ data: { stroke: "#0006ff", strokeWidth: 0.5 } }}
       />
       <VictoryScatter data={bbandClose} size={0.5} />
-      <VictoryScatter
-        data={bbandFail}
-        style={{ data: { fill: "#c43a31" } }}
-        size={0.5}
-      />
       <VictoryCandlestick data={candleData} />
     </VictoryChart>
   )
