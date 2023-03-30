@@ -10,6 +10,14 @@ const StatusComponent = ({ status }) => {
   return <div className={`mx-auto p-1 ${background} rounded`}>{text}</div>
 }
 
+function newDate(epoch) {
+  const date = new Date(epoch)
+  return new Intl.DateTimeFormat("en-US", {
+    timeStyle: "long",
+    timeZone: "America/New_York",
+  }).format(date)
+}
+
 const Status = ({ data }) => {
   const [bbands1m, setBbands1m] = useState(false)
   const [stochRSI1m, setStochRSI1m] = useState(false)
@@ -17,6 +25,7 @@ const Status = ({ data }) => {
   const [hma3m, setHMA3m] = useState(false)
   const [hma5m, setHMA5m] = useState(false)
   const [passing, setPassing] = useState(false)
+  const [timestampData, setTimestampData] = useState(0)
 
   useEffect(() => {
     if (data.length === 0) {
@@ -28,10 +37,12 @@ const Status = ({ data }) => {
     setHMA3m(data[3].hma)
     setHMA5m(data[5].hma)
     setPassing(data.passing)
+    setTimestampData(data.timestamp)
   }, [data])
 
   return (
     <div className="flex flex-col space-y-4 bg-slate-500 pt-6">
+      <div>{newDate(timestampData)}</div>
       <div>
         <h1>1m</h1>
         <div className="grid grid-cols-2">

@@ -17,6 +17,7 @@ const Dashboard = () => {
 
   const [statusData, setStatusData] = useState({
     passing: false,
+    timestamp: 0,
     1: {
       bbands: false,
       stochRSI: false,
@@ -38,22 +39,24 @@ const Dashboard = () => {
     }
 
     if (lastMessage !== null) {
-      // Sort messages by interval for appropriate chart.
       const data = JSON.parse(lastMessage.data)
       for (const json of data) {
         const setHist = history[json.interval]
+
         setHist((prev) => {
           if (prev.length === maxHistoryLength) {
             prev.shift()
           }
           return prev.concat(json)
         })
+
         if (json.interval === 1) {
           console.log(json)
           setStatusData((prev) => {
             return {
               ...prev,
               passing: json.state,
+              timestamp: json.timestamp,
               1: {
                 bbands: json.criteria.bbands.state,
                 stochRSI: json.criteria.stochRSI.state,
@@ -67,6 +70,7 @@ const Dashboard = () => {
             return {
               ...prev,
               passing: json.state,
+              timestamp: json.timestamp,
               3: {
                 hma: json.criteria.hma.state,
               },
@@ -78,6 +82,7 @@ const Dashboard = () => {
             return {
               ...prev,
               passing: json.state,
+              timestamp: json.timestamp,
               5: {
                 hma: json.criteria.hma.state,
               },
