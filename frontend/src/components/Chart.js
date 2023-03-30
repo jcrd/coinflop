@@ -160,7 +160,8 @@ const Chart = ({ interval, history }) => {
   }, [history])
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pt-6">
+      <h1 className="text-xl">{interval}m</h1>
       <VictoryChart theme={VictoryTheme.material} scale={{ x: "time" }}>
         <VictoryAxis
           tickValues={candleAxis}
