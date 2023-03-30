@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react"
 
+import Axis from "./Axis.js"
+
 import {
   VictoryAxis,
   VictoryChart,
@@ -15,6 +17,7 @@ const LineChart = ({ history }) => {
 
   const [stochRSIK, setStochRSIK] = useState([])
   const [stochRSID, setStochRSID] = useState([])
+  const [axisValues, setAxisValues] = useState([])
 
   useEffect(() => {
     const setState = {
@@ -32,6 +35,8 @@ const LineChart = ({ history }) => {
 
     history.forEach((v) => {
       const date = new Date(v.closeTime)
+
+      setAxisValues((prev) => prev.concat(date))
 
       const rsi = v.criteria.stochRSI
       for (const name in rsi.values) {
@@ -52,11 +57,7 @@ const LineChart = ({ history }) => {
       scale={{ x: "time" }}
       height={200}
     >
-      <VictoryAxis
-        tickLabelComponent={
-          <VictoryLabel angle={-45} style={[{ fontSize: 8 }]} />
-        }
-      />
+      {Axis(axisValues)}
       <VictoryAxis dependentAxis />
       <VictoryLine
         data={stochRSIK}

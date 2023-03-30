@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react"
 
+import Axis from "./Axis.js"
+
 import {
   VictoryAxis,
   VictoryCandlestick,
   VictoryChart,
-  VictoryLabel,
   VictoryLine,
   VictoryScatter,
   VictoryTheme,
@@ -17,7 +18,7 @@ const Chart = ({ history }) => {
   const [bbandClose, setBbandClose] = useState([])
   const [bbandFail, setBbandFail] = useState([])
 
-  const [candleAxis, setCandleAxis] = useState([])
+  const [axisValues, setAxisValues] = useState([])
   const [candleData, setCandleData] = useState([])
 
   const [hmaData, setHMAData] = useState([])
@@ -34,10 +35,6 @@ const Chart = ({ history }) => {
       hma: {
         data: setHMAData,
       },
-      candle: {
-        axis: setCandleAxis,
-        data: setCandleData,
-      },
     }
 
     for (const type in setState) {
@@ -49,7 +46,7 @@ const Chart = ({ history }) => {
     history.forEach((v) => {
       const date = new Date(v.closeTime)
 
-      setCandleAxis((prev) => prev.concat(date))
+      setAxisValues((prev) => prev.concat(date))
       setCandleData((prev) =>
         prev.concat({
           x: date,
@@ -94,21 +91,7 @@ const Chart = ({ history }) => {
 
   return (
     <VictoryChart theme={VictoryTheme.material} scale={{ x: "time" }}>
-      <VictoryAxis
-        tickValues={candleAxis}
-        tickFormat={(d) => {
-          try {
-            return `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`
-          } catch (e) {
-            if (!(e instanceof TypeError)) {
-              throw e
-            }
-          }
-        }}
-        tickLabelComponent={
-          <VictoryLabel angle={-45} style={[{ fontSize: 4 }]} />
-        }
-      />
+      {Axis(axisValues)}
       <VictoryAxis dependentAxis />
       <VictoryLine
         data={hmaData}
