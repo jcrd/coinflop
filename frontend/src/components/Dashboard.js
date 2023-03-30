@@ -92,9 +92,18 @@ const Dashboard = () => {
     <div className="grid grid-cols-5 h-screen">
       <Status className="col-span-1" data={statusData}></Status>
       <div className="col-span-4 grid grid-cols-3 grid-rows-2 h-screen">
-        <CandleChart interval={1} history={history1m} />
-        <CandleChart interval={3} history={history3m} />
-        <CandleChart interval={5} history={history5m} />
+        <div className="flex flex-col pt-6">
+          <h1 className="text-xl">1m</h1>
+          <CandleChart history={history1m} />
+        </div>
+        <div className="flex flex-col pt-6">
+          <h1 className="text-xl">3m</h1>
+          <CandleChart history={history3m} />
+        </div>
+        <div className="flex flex-col pt-6">
+          <h1 className="text-xl">5m</h1>
+          <CandleChart history={history5m} />
+        </div>
         <LineChart history={history1m} />
       </div>
     </div>

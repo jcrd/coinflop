@@ -10,7 +10,7 @@ import {
   VictoryTheme,
 } from "victory"
 
-const Chart = ({ interval, history }) => {
+const Chart = ({ history }) => {
   const [bbandLower, setBbandLower] = useState([])
   const [bbandMiddle, setBbandMiddle] = useState([])
   const [bbandUpper, setBbandUpper] = useState([])
@@ -93,57 +93,51 @@ const Chart = ({ interval, history }) => {
   }, [history])
 
   return (
-    <div className="flex flex-col pt-6">
-      <h1 className="text-xl">{interval}m</h1>
-      <VictoryChart theme={VictoryTheme.material} scale={{ x: "time" }}>
-        <VictoryAxis
-          tickValues={candleAxis}
-          tickFormat={(d) => {
-            try {
-              return `${d.getHours()}:${String(d.getMinutes()).padStart(
-                2,
-                "0"
-              )}`
-            } catch (e) {
-              if (!(e instanceof TypeError)) {
-                throw e
-              }
+    <VictoryChart theme={VictoryTheme.material} scale={{ x: "time" }}>
+      <VictoryAxis
+        tickValues={candleAxis}
+        tickFormat={(d) => {
+          try {
+            return `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`
+          } catch (e) {
+            if (!(e instanceof TypeError)) {
+              throw e
             }
-          }}
-          tickLabelComponent={
-            <VictoryLabel angle={-45} style={[{ fontSize: 4 }]} />
           }
-        />
-        <VictoryAxis dependentAxis />
-        <VictoryLine
-          data={hmaData}
-          interpolation="natural"
-          style={{ data: { stroke: "#89723a", strokeWidth: 0.5 } }}
-        />
-        <VictoryLine
-          data={bbandLower}
-          interpolation="natural"
-          style={{ data: { stroke: "#ff0040", strokeWidth: 0.5 } }}
-        />
-        <VictoryLine
-          data={bbandMiddle}
-          interpolation="natural"
-          style={{ data: { stroke: "#ffb500", strokeWidth: 0.5 } }}
-        />
-        <VictoryLine
-          data={bbandUpper}
-          interpolation="natural"
-          style={{ data: { stroke: "#0006ff", strokeWidth: 0.5 } }}
-        />
-        <VictoryScatter data={bbandClose} size={0.5} />
-        <VictoryScatter
-          data={bbandFail}
-          style={{ data: { fill: "#c43a31" } }}
-          size={0.5}
-        />
-        <VictoryCandlestick data={candleData} />
-      </VictoryChart>
-    </div>
+        }}
+        tickLabelComponent={
+          <VictoryLabel angle={-45} style={[{ fontSize: 4 }]} />
+        }
+      />
+      <VictoryAxis dependentAxis />
+      <VictoryLine
+        data={hmaData}
+        interpolation="natural"
+        style={{ data: { stroke: "#89723a", strokeWidth: 0.5 } }}
+      />
+      <VictoryLine
+        data={bbandLower}
+        interpolation="natural"
+        style={{ data: { stroke: "#ff0040", strokeWidth: 0.5 } }}
+      />
+      <VictoryLine
+        data={bbandMiddle}
+        interpolation="natural"
+        style={{ data: { stroke: "#ffb500", strokeWidth: 0.5 } }}
+      />
+      <VictoryLine
+        data={bbandUpper}
+        interpolation="natural"
+        style={{ data: { stroke: "#0006ff", strokeWidth: 0.5 } }}
+      />
+      <VictoryScatter data={bbandClose} size={0.5} />
+      <VictoryScatter
+        data={bbandFail}
+        style={{ data: { fill: "#c43a31" } }}
+        size={0.5}
+      />
+      <VictoryCandlestick data={candleData} />
+    </VictoryChart>
   )
 }
 
