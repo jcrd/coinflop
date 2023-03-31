@@ -18,7 +18,7 @@ dotenv.config()
 
 function getStrategy() {
   const arg = process.argv[2]
-  return strategies[arg] || strategies["consensus"]
+  return strategies[arg] || strategies["ta_simple"]
 }
 
 const { contract, signerAddress } = Contract(
