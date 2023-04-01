@@ -4,16 +4,30 @@ import useWebSocket from "react-use-websocket"
 import CandleChart from "./CandleChart.js"
 import LineChart from "./LineChart.js"
 import Status from "./Status.js"
+import RoundHistory from "./RoundHistory.js"
 
 const WS_URL = "ws://127.0.0.1:8000"
 
-const maxHistoryLength = 50
+function fixedStateArray([get, set], size = 50) {
+  const setConcat = (msg) =>
+    set((prev) => {
+      if (prev.length === size) {
+        prev.shift()
+      }
+      return prev.concat(msg)
+    })
+  return [get, setConcat]
+}
 
 const Dashboard = () => {
   const { lastMessage } = useWebSocket(WS_URL)
-  const [history1m, setHistory1m] = useState([])
-  const [history3m, setHistory3m] = useState([])
-  const [history5m, setHistory5m] = useState([])
+
+  const [history1m, concatHistory1m] = fixedStateArray(useState([]))
+  const [history3m, concatHistory3m] = fixedStateArray(useState([]))
+  const [history5m, concatHistory5m] = fixedStateArray(useState([]))
+
+  const [logMessages, concatLogMessages] = fixedStateArray(useState([]))
+  const [roundHistory, concatRoundHistory] = fixedStateArray(useState([]))
 
   const [statusData, setStatusData] = useState({
     passing: false,
@@ -31,42 +45,32 @@ const Dashboard = () => {
     },
   })
 
-  const [logMessages, setLogMessages] = useState([])
-
   useEffect(() => {
     if (lastMessage === null) {
       return
     }
 
     const history = {
-      1: setHistory1m,
-      3: setHistory3m,
-      5: setHistory5m,
+      1: concatHistory1m,
+      3: concatHistory3m,
+      5: concatHistory5m,
     }
 
     const data = JSON.parse(lastMessage.data)
     for (const json of data) {
-      if ("logMessage" in json) {
-        setLogMessages((prev) => {
-          if (prev.length === maxHistoryLength) {
-            prev.shift()
-          }
-          return prev.concat(json.logMessage)
-        })
+      if (json.type === "log") {
+        concatLogMessages(json)
         continue
       }
 
-      const setHist = history[json.interval]
+      if (json.type === "history") {
+        concatRoundHistory(json)
+        continue
+      }
 
-      setHist((prev) => {
-        if (prev.length === maxHistoryLength) {
-          prev.shift()
-        }
-        return prev.concat(json)
-      })
+      history[json.interval](json)
 
       if (json.interval === 1) {
-        console.log(json)
         setStatusData((prev) => {
           return {
             ...prev,
@@ -113,7 +117,7 @@ const Dashboard = () => {
         className="col-span-1"
         data={statusData}
         logMessages={logMessages}
-      ></Status>
+      />
       <div className="col-span-4 grid grid-cols-3 grid-rows-2 h-screen">
         <div className="flex flex-col pt-6">
           <h1 className="text-xl">1m</h1>
@@ -128,6 +132,9 @@ const Dashboard = () => {
           <CandleChart history={history5m} />
         </div>
         <LineChart history={history1m} />
+        <div className="col-span-2 my-auto">
+          <RoundHistory data={roundHistory} />
+        </div>
       </div>
     </div>
   )
