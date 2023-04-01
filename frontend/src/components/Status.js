@@ -73,11 +73,11 @@ const Status = ({ data, logMessages }) => {
         </div>
         <StatusComponent name="passing" status={passing} />
       </div>
-      <ol className="h-3/5 overflow-y-scroll px-8">
-        {logMessages.map((msg) => (
-          <li>{msg}</li>
+      <div className="h-3/5 overflow-y-scroll px-8">
+        {logMessages.map((v) => (
+          <div>{v.message}</div>
         ))}
-      </ol>
+      </div>
     </div>
   )
 }
