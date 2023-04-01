@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import Contract from "./lib/contract.js"
 import Loop from "./lib/loop.js"
 import Logger from "./lib/logger.js"
-import history from "./lib/history.js"
+import History from "./lib/history.js"
 import runServer from "./lib/server.js"
 
 import strategies from "./lib/strategies/index.js"
@@ -26,9 +26,11 @@ const { contract, signerAddress } = Contract(
   process.env.WALLET_PRIVATE_KEY
 )
 
-const loop = Loop(contract, signerAddress)
-loop.addObserver(history)
-loop.addObserver(Logger())
+const loop = new Loop(contract, signerAddress)
+const history = new History("db/history")
+
+loop.addObserver(history.observer())
+loop.addObserver(Logger(history))
 
 const strategy = getStrategy()
 loop.useStrategy(new strategy(BET_AMOUNT))
@@ -40,6 +42,7 @@ process.on("SIGINT", () => {
 
 console.log("Running...")
 
-const stopServer = runServer(loop)
+const stopServer = runServer(loop, history)
+await history.load()
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
 stopServer()
