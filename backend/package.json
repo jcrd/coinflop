@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "app": "concurrently \"node app.js\" \"cd frontend && npm start\""
+    "app": "concurrently \"node app.js\" \"cd ../frontend && npm start\""
   },
   "dependencies": {
     "@debut/indicators": "^1.3.15",
