@@ -19,18 +19,18 @@ const Dashboard = () => {
   const [roundHistory, setRoundHistory] = useState([])
 
   const [statusData, setStatusData] = useState({
-    passing: false,
+    state: null,
     timestamp: 0,
     1: {
-      bbands: false,
-      stochRSI: false,
-      hma: false,
+      bbands: { state: null, values: {} },
+      stochRSI: { state: null, values: {} },
+      hma: { state: null, values: {} },
     },
     3: {
-      hma: false,
+      hma: { state: null, values: {} },
     },
     5: {
-      hma: false,
+      hma: { state: null, values: {} },
     },
   })
 
@@ -72,7 +72,7 @@ const Dashboard = () => {
         setStatusData((prev) => {
           return {
             ...prev,
-            passing: json.state,
+            state: json.state,
             timestamp: json.closeTime,
             1: {
               bbands: json.criteria.bbands.state,
@@ -86,7 +86,7 @@ const Dashboard = () => {
         setStatusData((prev) => {
           return {
             ...prev,
-            passing: json.state,
+            state: json.state,
             timestamp: json.closeTime,
             3: {
               hma: json.criteria.hma.state,
@@ -98,7 +98,7 @@ const Dashboard = () => {
         setStatusData((prev) => {
           return {
             ...prev,
-            passing: json.state,
+            state: json.state,
             timestamp: json.closeTime,
             5: {
               hma: json.criteria.hma.state,

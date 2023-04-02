@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react"
 
-const StatusComponent = ({ status }) => {
-  let text = "failing"
-  let background = "bg-red-500"
-  if (status) {
-    text = "passing"
+const StatusComponent = ({ state }) => {
+  let text = "NONE"
+  let background = "bg-yellow-500"
+  if (state === true) {
+    text = "BULL"
     background = "bg-green-500"
+  }
+  if (state === false) {
+    text = "BEAR"
+    background = "bg-red-500"
   }
   return <div className={`mx-auto p-1 ${background} rounded`}>{text}</div>
 }
@@ -24,7 +28,7 @@ const Status = ({ data, logMessages }) => {
   const [hma1m, setHMA1m] = useState(false)
   const [hma3m, setHMA3m] = useState(false)
   const [hma5m, setHMA5m] = useState(false)
-  const [passing, setPassing] = useState(false)
+  const [direction, setDirection] = useState(false)
   const [timestampData, setTimestampData] = useState(0)
 
   useEffect(() => {
@@ -36,7 +40,7 @@ const Status = ({ data, logMessages }) => {
     setHMA1m(data[1].hma)
     setHMA3m(data[3].hma)
     setHMA5m(data[5].hma)
-    setPassing(data.passing)
+    setDirection(data.state)
     setTimestampData(data.timestamp)
   }, [data])
 
@@ -49,29 +53,28 @@ const Status = ({ data, logMessages }) => {
             <h1>1m</h1>
             <div className="grid grid-cols-2">
               <p className="p-1">bbands</p>
-              <StatusComponent status={bbands1m} />
+              <StatusComponent state={bbands1m} />
               <p className="p-1">stochRSI</p>
-              <StatusComponent status={stochRSI1m} />
+              <StatusComponent state={stochRSI1m} />
               <p className="p-1">HMA</p>
-              <StatusComponent status={hma1m} />
+              <StatusComponent state={hma1m} />
             </div>
           </div>
           <div className="flex flex-col gap-y-4">
             <h1>3m</h1>
             <div className="grid grid-cols-2">
-              <p className="p-1">HMA</p>{" "}
-              <StatusComponent name="hma" status={hma3m} />
+              <p className="p-1">HMA</p> <StatusComponent state={hma3m} />
             </div>
           </div>
           <div className="flex flex-col gap-y-4">
             <h1>5m</h1>
             <div className="grid grid-cols-2">
               <p className="p-1">HMA</p>
-              <StatusComponent name="hma" status={hma5m} />
+              <StatusComponent state={hma5m} />
             </div>
           </div>
         </div>
-        <StatusComponent name="passing" status={passing} />
+        <StatusComponent state={direction} />
       </div>
       <div className="h-3/5 overflow-y-scroll px-8">
         {logMessages.map((v) => (
