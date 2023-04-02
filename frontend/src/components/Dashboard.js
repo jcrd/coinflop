@@ -6,7 +6,7 @@ import LineChart from "./LineChart.js"
 import Status from "./Status.js"
 import RoundHistory from "./RoundHistory.js"
 
-const WS_URL = `ws://${process.env.REACT_APP_WS_URL}:${process.env.REACT_APP_WS_PORT}`
+const WS_URL = `${process.env.REACT_APP_WS_URL}:${process.env.REACT_APP_WS_PORT}`
 
 const Dashboard = () => {
   const { lastMessage } = useWebSocket(WS_URL)
