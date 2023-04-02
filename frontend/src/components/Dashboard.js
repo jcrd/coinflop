@@ -8,26 +8,15 @@ import RoundHistory from "./RoundHistory.js"
 
 const WS_URL = "ws://127.0.0.1:8000"
 
-function fixedStateArray([get, set], size = 50) {
-  const setConcat = (msg) =>
-    set((prev) => {
-      if (prev.length === size) {
-        prev.shift()
-      }
-      return prev.concat(msg)
-    })
-  return [get, setConcat]
-}
-
 const Dashboard = () => {
   const { lastMessage } = useWebSocket(WS_URL)
 
-  const [history1m, concatHistory1m] = fixedStateArray(useState([]))
-  const [history3m, concatHistory3m] = fixedStateArray(useState([]))
-  const [history5m, concatHistory5m] = fixedStateArray(useState([]))
+  const [history1m, setHistory1m] = useState([])
+  const [history3m, setHistory3m] = useState([])
+  const [history5m, setHistory5m] = useState([])
 
-  const [logMessages, concatLogMessages] = fixedStateArray(useState([]))
-  const [roundHistory, concatRoundHistory] = fixedStateArray(useState([]))
+  const [logMessages, setLogMessages] = useState([])
+  const [roundHistory, setRoundHistory] = useState([])
 
   const [statusData, setStatusData] = useState({
     passing: false,
@@ -50,25 +39,34 @@ const Dashboard = () => {
       return
     }
 
+    function concat(set, msg, size = 50) {
+      set((prev) => {
+        if (prev.length === size) {
+          prev.shift()
+        }
+        return prev.concat(msg)
+      })
+    }
+
     const history = {
-      1: concatHistory1m,
-      3: concatHistory3m,
-      5: concatHistory5m,
+      1: setHistory1m,
+      3: setHistory3m,
+      5: setHistory5m,
     }
 
     const data = JSON.parse(lastMessage.data)
     for (const json of data) {
       if (json.type === "log") {
-        concatLogMessages(json)
+        concat(setLogMessages, json)
         continue
       }
 
       if (json.type === "history") {
-        concatRoundHistory(json)
+        concat(setRoundHistory, json)
         continue
       }
 
-      history[json.interval](json)
+      concat(history[json.interval], json)
 
       if (json.interval === 1) {
         setStatusData((prev) => {
