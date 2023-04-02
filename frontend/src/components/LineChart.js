@@ -5,7 +5,6 @@ import Axis from "./Axis.js"
 import {
   VictoryAxis,
   VictoryChart,
-  VictoryLabel,
   VictoryLegend,
   VictoryLine,
   VictoryTheme,
