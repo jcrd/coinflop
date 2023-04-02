@@ -32,14 +32,11 @@ const Status = ({ data, logMessages }) => {
   const [timestampData, setTimestampData] = useState(0)
 
   useEffect(() => {
-    if (data.length === 0) {
-      return
-    }
-    setBbands1m(data[1].bbands)
-    setStochRSI1m(data[1].stochRSI)
-    setHMA1m(data[1].hma)
-    setHMA3m(data[3].hma)
-    setHMA5m(data[5].hma)
+    setBbands1m(data[1].bbands.state)
+    setStochRSI1m(data[1].stochRSI.state)
+    setHMA1m(data[1].hma.state)
+    setHMA3m(data[3].hma.state)
+    setHMA5m(data[5].hma.state)
     setDirection(data.state)
     setTimestampData(data.timestamp)
   }, [data])

@@ -66,46 +66,16 @@ const Dashboard = () => {
         continue
       }
 
-      concat(history[json.interval], json)
+      concat(history[json.interval], {
+        ...json,
+        criteria: json.criteria[json.interval],
+      })
 
-      if (json.interval === 1) {
-        setStatusData((prev) => {
-          return {
-            ...prev,
-            state: json.state,
-            timestamp: json.closeTime,
-            1: {
-              bbands: json.criteria.bbands.state,
-              stochRSI: json.criteria.stochRSI.state,
-              hma: json.criteria.hma.state,
-            },
-          }
-        })
-      }
-      if (json.interval === 3) {
-        setStatusData((prev) => {
-          return {
-            ...prev,
-            state: json.state,
-            timestamp: json.closeTime,
-            3: {
-              hma: json.criteria.hma.state,
-            },
-          }
-        })
-      }
-      if (json.interval === 5) {
-        setStatusData((prev) => {
-          return {
-            ...prev,
-            state: json.state,
-            timestamp: json.closeTime,
-            5: {
-              hma: json.criteria.hma.state,
-            },
-          }
-        })
-      }
+      setStatusData({
+        state: json.state,
+        timestamp: json.closeTime,
+        ...("criteria" in json ? json.criteria : {}),
+      })
     }
   }, [lastMessage])
 
