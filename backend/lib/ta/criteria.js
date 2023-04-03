@@ -1,18 +1,21 @@
-function reduceState(state) {
-  let trues = 0
-  let falses = 0
+const defState = { up: null, down: null }
 
-  for (const s of state) {
-    if (s === true) {
-      trues++
-    } else if (s === false) {
-      falses++
+function reduceState(states) {
+  let ups = 0
+  let downs = 0
+
+  for (let { up, down } of states) {
+    if (up) {
+      ups++
+    }
+    if (down) {
+      downs++
     }
   }
-  if (trues === state.length) {
+
+  if (ups === states.length) {
     return true
-  }
-  if (falses === state.length) {
+  } else if (downs === states.length) {
     return false
   }
   return null
@@ -28,12 +31,10 @@ export default function (criteria) {
       const r = c.predicate(close)
 
       if (!r) {
-        results[c.name] = { state: null, values: {} }
+        results[c.name] = { state: defState, values: {} }
         continue
       }
 
-      // This state can be true, false, or null.
-      r.state = reduceState(r.state)
       results[c.name] = r
       c.state = r.state
     }
@@ -42,7 +43,7 @@ export default function (criteria) {
 
     return {
       // This state can be true, false, or null.
-      state: reduceState(criteria.map((c) => c.state)),
+      state: reduceState(criteria.map((c) => c.state || defState)),
       criteria: criteriaState,
     }
   }

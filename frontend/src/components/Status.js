@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react"
 
 const StatusComponent = ({ state }) => {
-  let text = "NONE"
-  let background = "bg-yellow-500"
-  if (state === true) {
-    text = "BULL"
-    background = "bg-green-500"
-  }
-  if (state === false) {
-    text = "BEAR"
-    background = "bg-red-500"
-  }
-  return <div className={`mx-auto p-1 ${background} rounded`}>{text}</div>
+  return (
+    <div className="mx-auto flex">
+      <div
+        className={`p-1 ${state.up ? "bg-green-500" : "bg-red-500"} rounded`}
+      >
+        BULL
+      </div>
+      <div
+        className={`p-1 ${state.down ? "bg-green-500" : "bg-red-500"} rounded`}
+      >
+        BEAR
+      </div>
+    </div>
+  )
 }
 
 function newDate(epoch) {
@@ -71,7 +74,17 @@ const Status = ({ data, logMessages }) => {
             </div>
           </div>
         </div>
-        <StatusComponent state={direction} />
+        <div
+          className={`p-1 ${
+            direction === true
+              ? "bg-green-500"
+              : direction === false
+              ? "bg-red-500"
+              : "bg-yellow-500"
+          } rounded`}
+        >
+          {direction === true ? "BULL" : direction === false ? "BEAR" : "NONE"}
+        </div>
       </div>
       <div className="h-3/5 overflow-y-scroll px-8">
         {logMessages.map((v) => (

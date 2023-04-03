@@ -18,19 +18,20 @@ const Dashboard = () => {
   const [logMessages, setLogMessages] = useState([])
   const [roundHistory, setRoundHistory] = useState([])
 
+  const defState = { state: { up: false, down: false }, values: {} }
   const [statusData, setStatusData] = useState({
     state: null,
     timestamp: 0,
     1: {
-      bbands: { state: null, values: {} },
-      stochRSI: { state: null, values: {} },
-      hma: { state: null, values: {} },
+      bbands: defState,
+      stochRSI: defState,
+      hma: defState,
     },
     3: {
-      hma: { state: null, values: {} },
+      hma: defState,
     },
     5: {
-      hma: { state: null, values: {} },
+      hma: defState,
     },
   })
 
