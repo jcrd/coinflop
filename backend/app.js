@@ -1,3 +1,5 @@
+import { Worker } from "worker_threads"
+
 import dotenv from "dotenv"
 
 import Contract from "./lib/contract.js"
@@ -41,9 +43,21 @@ process.on("SIGINT", () => {
   loop.abort()
 })
 
+let frontend
+if (process.env.WITH_FRONTEND) {
+  frontend = new Worker("./frontend.js")
+  frontend.on("error", (e) => {
+    console.log(`frontend error: ${e}`)
+  })
+}
+
 console.log("Running...")
 
 const stopServer = runServer(loop, history)
 await history.load()
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
 stopServer()
+
+if (frontend) {
+  frontend.postMessage({ exit: true })
+}
