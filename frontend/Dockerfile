@@ -1,13 +1,13 @@
-FROM nginx:alpine
+FROM node as build
 
 ARG REACT_APP_WS_URL
 ARG REACT_APP_WS_PORT
-
-RUN apk add --update nodejs npm
 
 COPY . .
 
 RUN npm ci
 RUN npm run build
 
-RUN cp -r build/* /usr/share/nginx/html/
+FROM nginx:alpine
+
+COPY --from=build build /usr/share/nginx/html
