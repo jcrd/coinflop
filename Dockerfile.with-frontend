@@ -5,8 +5,7 @@ FROM node
 
 COPY . .
 
-RUN cd frontend && npm ci && npm run build
-RUN cd backend && npm ci && ln -s ../frontend/build frontend
+RUN ./build.sh
 
 WORKDIR backend
 ENTRYPOINT ["npm", "run", "with-frontend"]
