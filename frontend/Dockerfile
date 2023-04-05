@@ -1,7 +1,7 @@
-FROM node as build
-
 ARG REACT_APP_WS_URL
 ARG REACT_APP_WS_PORT
+
+FROM node as build
 
 COPY . .
 
