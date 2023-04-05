@@ -6,7 +6,7 @@ import { newFixedArray } from "./utils.js"
 import { Logger, HistoryLogger } from "./logger.js"
 
 export default function runServer(loop, history, queueSize = 600) {
-  const port = process.env.PORT || 8000
+  const port = process.env.WS_PORT || 8000
   const wss = new WebSocketServer({ port: port })
 
   console.log(`Running websocket server on port: ${port}`)
