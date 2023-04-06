@@ -29,8 +29,8 @@ export default class Strategy extends Emitter {
       error: null,
     }
     try {
-      if (!this.simulate && this.state !== null) {
-        const tx = await contract["bet" + direction](epoch, {
+      if (!this.simulate && state !== null) {
+        const tx = await contract["bet" + state](epoch, {
           value: ethers.parseEther(amount),
         })
         await tx.wait()
