@@ -20,14 +20,11 @@ export default class Loop extends Emitter {
     this.running = false
     this.strategy
 
-    this.emitter.on(
-      Signals.Round.BetAction.Placed,
-      ({ betPlaced, simulate }) => {
-        if (!simulate && betPlaced === null) {
-          running = false
-        }
+    this.emitter.on(Signals.Round.BetAction, ({ error }) => {
+      if (error !== null) {
+        running = false
       }
-    )
+    })
 
     this.strategyObserver = {
       signals: {
