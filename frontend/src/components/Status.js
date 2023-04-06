@@ -4,12 +4,12 @@ const StatusComponent = ({ state }) => {
   return (
     <div className="mx-auto flex">
       <div
-        className={`p-1 ${state.up ? "bg-green-500" : "bg-red-500"} rounded`}
+        className={`p-1 ${state.up ? "bg-green-500" : "bg-slate-600"} rounded`}
       >
         BULL
       </div>
       <div
-        className={`p-1 ${state.down ? "bg-green-500" : "bg-red-500"} rounded`}
+        className={`p-1 ${state.down ? "bg-red-500" : "bg-slate-600"} rounded`}
       >
         BEAR
       </div>
