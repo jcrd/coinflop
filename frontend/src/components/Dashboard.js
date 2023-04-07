@@ -20,7 +20,7 @@ const Dashboard = () => {
 
   const defState = { state: { up: false, down: false }, values: {} }
   const [statusData, setStatusData] = useState({
-    state: null,
+    direction: null,
     timestamp: 0,
     1: {
       bbands: defState,
@@ -73,7 +73,7 @@ const Dashboard = () => {
       })
 
       setStatusData({
-        state: json.state,
+        direction: json.direction,
         timestamp: json.closeTime,
         ...("criteria" in json ? json.criteria : {}),
       })

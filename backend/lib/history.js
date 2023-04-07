@@ -11,9 +11,14 @@ export default class History extends Emitter {
     this.db = new Level(dbPath, { valueEncoding: "json" })
 
     this.signals = {
-      [Signals.Round.BetAction]: async ({ epoch, state, amount, criteria }) =>
+      [Signals.Round.BetAction]: async ({
+        epoch,
+        direction,
+        amount,
+        criteria,
+      }) =>
         (this.values[epoch] = {
-          state: state,
+          direction: direction,
           amount: amount,
           criteria: criteria,
         }),
@@ -24,7 +29,7 @@ export default class History extends Emitter {
         if (epoch in this.values) {
           const entry = this.values[epoch]
           entry.result = result
-          entry.win = result === entry.state
+          entry.win = result === entry.direction
         } else {
           this.values[epoch] = { result: result }
         }

@@ -19,18 +19,18 @@ export default class Strategy extends Emitter {
     this.criteria = undefined
   }
 
-  async betAction(contract, epoch, state, amount) {
+  async betAction(contract, epoch, direction, amount) {
     const data = {
       epoch,
-      state,
+      direction,
       amount,
       simulate: this.simulate,
       criteria: this.criteria,
       error: null,
     }
     try {
-      if (!this.simulate && state !== null) {
-        const tx = await contract["bet" + state](epoch, {
+      if (!this.simulate && direction !== Direction.Skip) {
+        const tx = await contract["bet" + direction](epoch, {
           value: ethers.parseEther(amount),
         })
         await tx.wait()
@@ -67,7 +67,7 @@ export class TAStrategy extends Strategy {
   constructor(name, taName) {
     super(name)
     this.taName = taName
-    this.betState = null
+    this.betDirection = null
     this.worker = undefined
   }
 
@@ -76,12 +76,13 @@ export class TAStrategy extends Strategy {
     this.worker = new Worker(`./lib/ta/workers/${this.taName}.js`)
 
     this.worker.on("message", (data) => {
-      this.betState =
-        data.state === true
+      data.direction =
+        data.direction === true
           ? Direction.Bull
-          : data.state === false
+          : data.direction === false
           ? Direction.Bear
-          : null
+          : Direction.Skip
+      this.betDirection = data.direction
       this.criteria = data.criteria
       this.emitter.emit(Signals.TA, data)
     })

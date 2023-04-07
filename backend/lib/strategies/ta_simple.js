@@ -8,7 +8,12 @@ export default class TASimple extends TAStrategy {
 
   betFactory() {
     return async (round, contract) => {
-      await this.betAction(contract, round.epoch, this.betState, this.amount)
+      await this.betAction(
+        contract,
+        round.epoch,
+        this.betDirection,
+        this.amount
+      )
     }
   }
 }

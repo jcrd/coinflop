@@ -1,4 +1,4 @@
-import { Signals } from "./enums.js"
+import { Direction, Signals } from "./enums.js"
 
 function bigintDiv(a, b) {
   if (b == 0) {
@@ -33,19 +33,19 @@ export function Logger(name = "logger", func = console.log) {
   }
   signals[Signals.Round.BetAction] = ({
     epoch,
-    state,
+    direction,
     amount,
     simulate,
     error,
   }) => {
-    if (state !== null) {
+    if (direction !== Direction.Skip) {
       if (simulate) {
-        func(`Round ${epoch}: ${state} bet simulated (${amount})`)
+        func(`Round ${epoch}: ${direction} bet simulated (${amount})`)
       } else {
-        func(`Round ${epoch}: ${state} bet placed (${amount})`)
+        func(`Round ${epoch}: ${direction} bet placed (${amount})`)
       }
     } else if (error !== null) {
-      func(`Round ${epoch}: Failed to place ${state} bet: ${error}`)
+      func(`Round ${epoch}: Failed to place ${direction} bet: ${error}`)
     } else {
       func(`Round ${epoch}: Bet skipped`)
     }

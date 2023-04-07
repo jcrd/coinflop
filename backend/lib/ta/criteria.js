@@ -43,7 +43,7 @@ export default function (criteria) {
 
     return {
       // This state can be true, false, or null.
-      state: reduceState(criteria.map((c) => c.state || defState)),
+      direction: reduceState(criteria.map((c) => c.state || defState)),
       criteria: criteriaState,
     }
   }

@@ -6,12 +6,12 @@ const StatusComponent = ({ state }) => {
       <div
         className={`p-1 ${state.up ? "bg-green-500" : "bg-slate-600"} rounded`}
       >
-        BULL
+        Bull
       </div>
       <div
         className={`p-1 ${state.down ? "bg-red-500" : "bg-slate-600"} rounded`}
       >
-        BEAR
+        Bear
       </div>
     </div>
   )
@@ -31,7 +31,7 @@ const Status = ({ data, logMessages }) => {
   const [hma1m, setHMA1m] = useState(false)
   const [hma3m, setHMA3m] = useState(false)
   const [hma5m, setHMA5m] = useState(false)
-  const [direction, setDirection] = useState(false)
+  const [direction, setDirection] = useState("Skip")
   const [timestampData, setTimestampData] = useState(0)
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const Status = ({ data, logMessages }) => {
     setHMA1m(data[1].hma.state)
     setHMA3m(data[3].hma.state)
     setHMA5m(data[5].hma.state)
-    setDirection(data.state)
+    setDirection(data.direction)
     setTimestampData(data.timestamp)
   }, [data])
 
@@ -76,14 +76,14 @@ const Status = ({ data, logMessages }) => {
         </div>
         <div
           className={`p-1 ${
-            direction === true
+            direction === "Bull"
               ? "bg-green-500"
-              : direction === false
+              : direction === "Bear"
               ? "bg-red-500"
               : "bg-yellow-500"
           } rounded`}
         >
-          {direction === true ? "BULL" : direction === false ? "BEAR" : "NONE"}
+          {direction}
         </div>
       </div>
       <div className="h-3/5 overflow-y-scroll px-8">

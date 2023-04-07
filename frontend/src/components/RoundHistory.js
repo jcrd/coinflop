@@ -4,7 +4,7 @@ const Round = ({ value }) => {
       <div>{value.epoch}</div>
       <div className="grid grid-cols-2">
         <div>Bet</div>
-        <div>{value.bet ? value.bet : "-"}</div>
+        <div>{value.direction ? value.direction : "-"}</div>
         <div>Amount</div>
         <div>{value.amount ? value.amount : "-"}</div>
         <div>Result</div>

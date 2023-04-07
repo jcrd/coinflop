@@ -1,6 +1,7 @@
 export const Direction = {
   Bear: "Bear",
   Bull: "Bull",
+  Skip: "Skip",
 }
 
 export const Signals = {
