@@ -13,7 +13,7 @@ export default class Loop extends Emitter {
     super()
     this.contract = contract
     this.signerAddress = signerAddress
-    this.lastEpoch = 0
+    this.lastEpoch = BigInt(0)
 
     this.controller = new AbortController()
 
@@ -61,11 +61,13 @@ export default class Loop extends Emitter {
     const epoch = await this.contract.currentEpoch()
     const round = await this.contract.rounds(epoch)
 
-    if (this.lastEpoch === 0 || round.epoch > this.lastEpoch) {
+    const estEpoch = this.lastEpoch + BigInt(1)
+
+    if (this.lastEpoch == 0 || round.epoch === estEpoch) {
       this.lastEpoch = round.epoch
     } else {
       console.log(
-        `ERROR: Bad epoch received from contract: current ${round.epoch} <= last ${this.lastEpoch}; retrying...`
+        `ERROR: Bad epoch received from contract: current ${round.epoch} != estimated ${estEpoch}; retrying...`
       )
       return true
     }
