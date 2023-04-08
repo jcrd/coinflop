@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 import Axis from "./Axis.js"
+import { arrayTransformer } from "./util.js"
 
 import {
   VictoryAxis,
@@ -11,43 +12,35 @@ import {
 } from "victory"
 
 const LineChart = ({ history }) => {
+  const { define, get, update } = arrayTransformer()
+
   const kColor = "#a899df"
   const dColor = "#2fc3eb"
 
-  const [stochRSIK, setStochRSIK] = useState([])
-  const [stochRSID, setStochRSID] = useState([])
-  const [axisValues, setAxisValues] = useState([])
+  define({
+    name: "stochRSIk",
+    state: useState([]),
+    transform: (v) => ({
+      x: new Date(v.closeTime),
+      y: parseFloat(v.criteria.stochRSI.values.k),
+    }),
+  })
+  define({
+    name: "stochRSId",
+    state: useState([]),
+    transform: (v) => ({
+      x: new Date(v.closeTime),
+      y: parseFloat(v.criteria.stochRSI.values.d),
+    }),
+  })
+  define({
+    name: "chartAxis",
+    state: useState([]),
+    transform: (v) => new Date(v.closeTime),
+  })
 
   useEffect(() => {
-    const setState = {
-      stochRSI: {
-        k: setStochRSIK,
-        d: setStochRSID,
-      },
-    }
-
-    for (const type in setState) {
-      for (const name in setState[type]) {
-        setState[type][name]([])
-      }
-    }
-
-    history.forEach((v) => {
-      const date = new Date(v.closeTime)
-
-      setAxisValues((prev) => prev.concat(date))
-
-      const rsi = v.criteria.stochRSI
-      for (const name in rsi.values) {
-        const set = setState.stochRSI[name]
-        set((prev) =>
-          prev.concat({
-            x: date,
-            y: parseFloat(rsi.values[name]),
-          })
-        )
-      }
-    })
+    update(history)
   }, [history])
 
   return (
@@ -56,14 +49,14 @@ const LineChart = ({ history }) => {
       scale={{ x: "time" }}
       height={200}
     >
-      {Axis(axisValues)}
+      {Axis(get("chartAxis"))}
       <VictoryAxis dependentAxis />
       <VictoryLine
-        data={stochRSIK}
+        data={get("stochRSIk")}
         style={{ data: { stroke: kColor, strokeWidth: 0.5 } }}
       />
       <VictoryLine
-        data={stochRSID}
+        data={get("stochRSId")}
         style={{ data: { stroke: dColor, strokeWidth: 0.5 } }}
       />
       <VictoryLegend
