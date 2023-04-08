@@ -43,13 +43,12 @@ process.on("SIGINT", () => {
   loop.abort()
 })
 
-let frontend
-if (process.env.WITH_FRONTEND) {
-  frontend = new Worker("./frontend.js")
-  frontend.on("error", (e) => {
-    console.log(`frontend error: ${e}`)
-  })
-}
+const httpServer = new Worker("./http-server.js", {
+  workerData: { frontend: process.env.WITH_FRONTEND || false },
+})
+httpServer.on("error", (e) => {
+  console.log(`HTTP server error: ${e}`)
+})
 
 console.log("Running...")
 
@@ -58,6 +57,6 @@ await history.load()
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
 stopServer()
 
-if (frontend) {
-  frontend.postMessage({ exit: true })
+if (httpServer) {
+  httpServer.postMessage({ exit: true })
 }
