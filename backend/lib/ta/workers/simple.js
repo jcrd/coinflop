@@ -30,7 +30,7 @@ function hmaCriteria(interval) {
       }
       return {
         state: { up: close > v, down: close < v },
-        values: { hma: v },
+        values: { close, hma: v },
       }
     },
     interval: interval,
@@ -47,7 +47,7 @@ const worker = KlineWorker([
       }
       return {
         state: { up: close < v.upper, down: close > v.lower },
-        values: v,
+        values: { close, ...v },
       }
     },
     interval: 1,
@@ -68,7 +68,7 @@ const worker = KlineWorker([
           up: k > d && k > 0.3 && k < 0.7,
           down: k < d && k > 0.3 && k < 0.7,
         },
-        values: { k: k, d: d },
+        values: { close, k, d },
       }
     },
     interval: 1,
