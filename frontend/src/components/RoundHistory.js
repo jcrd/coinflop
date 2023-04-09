@@ -11,7 +11,11 @@ const Round = ({ value }) => {
         <div>{value.result ? value.result : "-"}</div>
         <div>Win</div>
         <div>
-          {value.win !== undefined ? (value.win ? "true" : "false") : "-"}
+          {value.direction && value.direction !== "Skip"
+            ? value.win
+              ? "true"
+              : "false"
+            : "-"}
         </div>
       </div>
     </div>
