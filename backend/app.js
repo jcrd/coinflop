@@ -6,6 +6,7 @@ import Loop from "./lib/loop.js"
 import { Logger, HistoryLogger } from "./lib/logger.js"
 import History from "./lib/history.js"
 import runWSServer from "./lib/wss.js"
+import MongoDB from "./lib/mongodb.js"
 
 import strategies from "./lib/strategies/index.js"
 
@@ -27,17 +28,18 @@ const { contract, signerAddress } = Contract(
   process.env.WALLET_PRIVATE_KEY
 )
 
-const history = new History("db/history")
+const history = new History()
 history.addObserver(HistoryLogger())
 
 const loop = new Loop(contract, signerAddress)
 loop.addObserver(history.observer())
 loop.addObserver(Logger())
 
-const strategy = getStrategy()
-loop.useStrategy(new strategy(BET_AMOUNT))
-
+const db = await MongoDB(process.env.MONGO_URL)
+const wsServer = runWSServer(loop, history)
 const app = express()
+
+history.addObserver(db)
 
 app.get("/status", (_, res) => {
   res.send("OK")
@@ -57,16 +59,21 @@ const httpServer = app.listen(process.env.PORT || 8000, () => {
   console.log(`Running server on port: ${httpServer.address().port}`)
 })
 
-process.on("SIGINT", () => {
-  console.log("Received SIGINT")
-  loop.abort()
-  httpServer.close()
-})
-
-const wsServer = runWSServer(loop, history)
 httpServer.on("upgrade", wsServer.upgrade)
 
-await history.load()
-await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
+process.on("SIGINT", async () => {
+  console.log("Received SIGINT")
+  loop.abort()
+  await db.close()
+  wsServer.close()
+  httpServer.close((err) => {
+    process.exit(err ? 1 : 0)
+  })
+})
 
-wsServer.stop()
+// Called last so signal data is queued by websocket server.
+const strategy = getStrategy()
+loop.useStrategy(new strategy(BET_AMOUNT))
+history.load(await db.load())
+
+await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)

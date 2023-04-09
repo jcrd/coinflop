@@ -1,14 +1,11 @@
-import { Level } from "level"
-
 import Emitter from "./emitter.js"
 import { Direction, Signals } from "./enums.js"
 
 export default class History extends Emitter {
-  constructor(dbPath, name = "history") {
+  constructor(name = "history") {
     super()
     this.name = name
-    this.values = {}
-    this.db = new Level(dbPath, { valueEncoding: "json" })
+    this.entries = {}
 
     this.signals = {
       [Signals.Round.BetAction]: async ({
@@ -17,7 +14,7 @@ export default class History extends Emitter {
         amount,
         criteria,
       }) =>
-        (this.values[epoch] = {
+        (this.entries[epoch] = {
           direction: direction,
           amount: amount,
           criteria: criteria,
@@ -26,25 +23,23 @@ export default class History extends Emitter {
         const epoch = round.epoch
         const result =
           round.closePrice > round.lockPrice ? Direction.Bull : Direction.Bear
-        if (epoch in this.values) {
-          const entry = this.values[epoch]
+        if (epoch in this.entries) {
+          const entry = this.entries[epoch]
           entry.result = result
           entry.win = result === entry.direction
+          this.emitter.emit("Update", { epoch: Number(epoch), ...entry })
         } else {
-          this.values[epoch] = { result: result }
+          this.entries[epoch] = { result: result }
         }
-        const value = this.values[epoch]
-        this.emitter.emit("Update", Number(epoch), value)
-        await this.db.put(epoch, value)
       },
     }
   }
 
-  async load() {
-    for await (const [epoch, value] of this.db.iterator()) {
-      this.values[epoch] = value
-      this.emitter.emit("Load", Number(epoch), value)
-    }
+  load(entries) {
+    entries.forEach((entry) => {
+      this.entries[entry.epoch] = entry
+      this.emitter.emit("Load", entry)
+    })
   }
 
   observer() {

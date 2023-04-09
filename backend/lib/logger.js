@@ -73,22 +73,22 @@ export function HistoryLogger(name = "historyLogger", func = console.log) {
   }
 
   const signals = {
-    Update: (epoch, value) => {
-      if (value.bet) {
-        data.streak = (value.win ? data.winning : !data.winning)
+    Update: (entry) => {
+      if (entry.bet) {
+        data.streak = (entry.win ? data.winning : !data.winning)
           ? data.streak + 1
           : 1
-        data.winning = value.win
+        data.winning = entry.win
 
         func(
-          `Round ${epoch}: Result = ${value.result} => ${
-            value.win ? "win" : "loss"
-          } (${value.amount}) [x${data.streak}]`
+          `Round ${entry.epoch}: Result = ${entry.result} => ${
+            entry.win ? "win" : "loss"
+          } (${entry.amount}) [x${data.streak}]`
         )
-      } else if (value.skipped) {
-        func(`Round ${epoch}: Result = ${value.result} => skipped`)
+      } else if (entry.skipped) {
+        func(`Round ${entry.epoch}: Result = ${entry.result} => skipped`)
       } else {
-        func(`Round ${epoch}: Result = ${value.result}`)
+        func(`Round ${entry.epoch}: Result = ${entry.result}`)
       }
     },
   }

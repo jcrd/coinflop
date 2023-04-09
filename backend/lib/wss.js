@@ -36,15 +36,15 @@ export default function runWSServer(loop, history, queueSize = 600) {
   })
   loop.addObserver(Logger("wsLoggerQueue", logger))
 
-  const historyQueue = (epoch, value) =>
-    queues.history.add({ type: "history", epoch: epoch, ...value })
+  const historyQueue = (entry) =>
+    queues.history.add({ type: "history", ...entry })
 
   history.addObserver({
     name: "historyQueue",
     signals: {
-      Update: (epoch, value) => {
-        historyQueue(epoch, value)
-        sendAll(JSON.stringify([{ type: "history", epoch: epoch, ...value }]))
+      Update: (entry) => {
+        historyQueue(entry)
+        sendAll(JSON.stringify([{ type: "history", ...entry }]))
       },
       Load: historyQueue,
     },
@@ -69,7 +69,7 @@ export default function runWSServer(loop, history, queueSize = 600) {
         wss.emit("connection", ws, req)
       })
     },
-    stop: () => {
+    close: () => {
       websockets.forEach((ws) => ws.close())
 
       loop.removeObserver("broadcastQueue")
