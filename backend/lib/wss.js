@@ -5,11 +5,8 @@ import { newFixedArray } from "./utils.js"
 
 import { Logger, HistoryLogger } from "./logger.js"
 
-export default function runServer(loop, history, queueSize = 600) {
-  const port = process.env.WS_PORT || 8000
-  const wss = new WebSocketServer({ port: port })
-
-  console.log(`Running websocket server on port: ${port}`)
+export default function runWSServer(loop, history, queueSize = 600) {
+  const wss = new WebSocketServer({ noServer: true })
 
   const queues = {
     broadcast: newFixedArray(queueSize),
@@ -69,14 +66,21 @@ export default function runServer(loop, history, queueSize = 600) {
     }
   })
 
-  return () => {
-    websockets.forEach((ws) => ws.close())
+  return {
+    upgrade: (req, socket, head) => {
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit("connection", ws, req)
+      })
+    },
+    stop: () => {
+      websockets.forEach((ws) => ws.close())
 
-    loop.removeObserver("broadcastQueue")
-    loop.removeObserver("wsLoggerQueue")
-    history.removeObserver("historyQueue")
-    history.removeObserver("wsHistoryLoggerQueue")
+      loop.removeObserver("broadcastQueue")
+      loop.removeObserver("wsLoggerQueue")
+      history.removeObserver("historyQueue")
+      history.removeObserver("wsHistoryLoggerQueue")
 
-    wss.close()
+      wss.close()
+    },
   }
 }

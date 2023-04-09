@@ -1,12 +1,11 @@
-import { Worker } from "worker_threads"
-
 import dotenv from "dotenv"
+import express from "express"
 
 import Contract from "./lib/contract.js"
 import Loop from "./lib/loop.js"
 import { Logger, HistoryLogger } from "./lib/logger.js"
 import History from "./lib/history.js"
-import runServer from "./lib/server.js"
+import runWSServer from "./lib/wss.js"
 
 import strategies from "./lib/strategies/index.js"
 
@@ -38,25 +37,36 @@ loop.addObserver(Logger())
 const strategy = getStrategy()
 loop.useStrategy(new strategy(BET_AMOUNT))
 
-process.on("SIGINT", () => {
-  console.log("Received SIGINT")
-  loop.abort()
+const app = express()
+
+app.get("/status", (_, res) => {
+  res.send("OK")
 })
 
-const httpServer = new Worker("./http-server.js", {
-  workerData: { frontend: process.env.WITH_FRONTEND || false },
-})
-httpServer.on("error", (e) => {
-  console.log(`HTTP server error: ${e}`)
-})
+if (process.env.WITH_FRONTEND) {
+  app.use(express.static("frontend"))
+
+  app.get("/", function (_, res) {
+    res.sendFile(path.join("frontend", "index.html"))
+  })
+}
 
 console.log("Running...")
 
-const stopServer = runServer(loop, history)
+const httpServer = app.listen(process.env.PORT || 8000, () => {
+  console.log(`Running server on port: ${httpServer.address().port}`)
+})
+
+process.on("SIGINT", () => {
+  console.log("Received SIGINT")
+  loop.abort()
+  httpServer.close()
+})
+
+const wsServer = runWSServer(loop, history)
+httpServer.on("upgrade", wsServer.upgrade)
+
 await history.load()
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
-stopServer()
 
-if (httpServer) {
-  httpServer.postMessage({ exit: true })
-}
+wsServer.stop()
