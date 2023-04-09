@@ -52,12 +52,9 @@ export default function runWSServer(loop, history, queueSize = 600) {
   history.addObserver(HistoryLogger("wsHistoryLoggerQueue", logger))
 
   wss.on("connection", (ws) => {
-    const id = websockets.length
     websockets.push(ws)
-    console.log(`websocket: #${id} connected`)
     ws.on("close", () => {
       websockets = websockets.filter((s) => s !== ws)
-      console.log(`websocket: #${id} disconnected`)
     })
 
     for (const name in queues) {
