@@ -2,7 +2,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/app.js",
-    "with-frontend": "WITH_FRONTEND=true node src/app.js"
+    "with-frontend": "WITH_FRONTEND=true node src/app.js",
+    "aggregation": "node scripts/aggregation.js"
   },
   "dependencies": {
     "@debut/indicators": "^1.3.15",
