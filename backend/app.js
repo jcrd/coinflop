@@ -6,7 +6,8 @@ import Loop from "./lib/loop.js"
 import { Logger, HistoryLogger } from "./lib/logger.js"
 import History from "./lib/history.js"
 import runWSServer from "./lib/wss.js"
-import MongoDB from "./lib/mongodb.js"
+import LevelDB from "./lib/db/level.js"
+import MongoDB from "./lib/db/mongo.js"
 
 import strategies from "./lib/strategies/index.js"
 
@@ -35,9 +36,20 @@ const loop = new Loop(contract, signerAddress)
 loop.addObserver(history.observer())
 loop.addObserver(Logger())
 
-const db = await MongoDB(process.env.MONGO_URL)
 const wsServer = runWSServer(loop, history)
 const app = express()
+
+let db
+
+switch (process.env.DATABASE) {
+  case "mongo":
+    console.log("Using mongodb")
+    db = await MongoDB(process.env.MONGO_URL)
+    break
+  default:
+    console.log("Using leveldb")
+    db = LevelDB("db/history")
+}
 
 history.addObserver(db)
 
