@@ -20,10 +20,14 @@ process.on("SIGINT", async () => {
   process.exit(0)
 })
 
-srcClient
+await srcClient
   .db("round")
   .collection("history")
   .find()
-  .forEach((entry) =>
-    destClient.db("round").collection("history").insertOne(entry)
+  .forEach(
+    async (entry) =>
+      await destClient.db("round").collection("history").insertOne(entry)
   )
+
+await destClient.close()
+await srcClient.close()
