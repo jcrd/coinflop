@@ -73,7 +73,7 @@ export class TAStrategy extends Strategy {
 
   run(observer) {
     super.run(observer)
-    this.worker = new Worker(`./lib/ta/workers/${this.taName}.js`)
+    this.worker = new Worker(`./src/lib/ta/workers/${this.taName}.js`)
 
     this.worker.on("message", (data) => {
       data.direction =
