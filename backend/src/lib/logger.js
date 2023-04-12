@@ -32,6 +32,7 @@ export function Logger(name = "logger", func = console.log) {
     )
   }
   signals[Signals.Round.BetAction] = ({
+    strategy,
     epoch,
     direction,
     amount,
@@ -40,14 +41,18 @@ export function Logger(name = "logger", func = console.log) {
   }) => {
     if (direction !== Direction.Skip) {
       if (simulate) {
-        func(`Round ${epoch}: ${direction} bet simulated (${amount})`)
+        func(
+          `Round ${epoch}: ${strategy}: ${direction} bet simulated (${amount})`
+        )
       } else {
-        func(`Round ${epoch}: ${direction} bet placed (${amount})`)
+        func(`Round ${epoch}: ${strategy}: ${direction} bet placed (${amount})`)
       }
     } else if (error !== null) {
-      func(`Round ${epoch}: Failed to place ${direction} bet: ${error}`)
+      func(
+        `Round ${epoch}: ${strategy}: Failed to place ${direction} bet: ${error}`
+      )
     } else {
-      func(`Round ${epoch}: Bet skipped`)
+      func(`Round ${epoch}: ${strategy}: Bet skipped`)
     }
   }
   signals[Signals.Round.WaitForLock] = (round, seconds) => {
@@ -55,9 +60,6 @@ export function Logger(name = "logger", func = console.log) {
   }
   signals[Signals.Round.Error] = (round, msg, err) => {
     func(`Round ${round.epoch}: ${msg}: ${err}`)
-  }
-  signals[Signals.UseStrategy] = (strategy) => {
-    func(`Using strategy: ${strategy.name}`)
   }
 
   return {
@@ -67,29 +69,21 @@ export function Logger(name = "logger", func = console.log) {
 }
 
 export function HistoryLogger(name = "historyLogger", func = console.log) {
-  const data = {
-    winning: false,
-    streak: 0,
-  }
-
   const signals = {
     Update: (entry) => {
-      if (entry.bet) {
-        data.streak = (entry.win ? data.winning : !data.winning)
-          ? data.streak + 1
-          : 1
-        data.winning = entry.win
-
-        func(
-          `Round ${entry.epoch}: Result = ${entry.result} => ${
-            entry.win ? "win" : "loss"
-          } (${entry.amount}) [x${data.streak}]`
-        )
-      } else if (entry.skipped) {
-        func(`Round ${entry.epoch}: Result = ${entry.result} => skipped`)
-      } else {
-        func(`Round ${entry.epoch}: Result = ${entry.result}`)
-      }
+      entry.bets.forEach((bet) => {
+        if (bet.direction === Direction.Skip) {
+          func(
+            `Round ${entry.epoch}: ${bet.strategy}: Result = ${entry.result} => skipped`
+          )
+        } else {
+          func(
+            `Round ${entry.epoch}: ${bet.strategy}: Result = ${
+              entry.result
+            } => ${bet.win ? "win" : "loss"}`
+          )
+        }
+      })
     },
   }
 

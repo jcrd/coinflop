@@ -1,78 +1,43 @@
 import { Worker } from "worker_threads"
 
-import Emitter from "./emitter.js"
-import { Direction, Signals as GlobalSignals } from "./enums.js"
+import { Direction, Signals } from "./enums.js"
 
-export const Signals = {
-  BetAction: "BetAction",
-  TA: "TA",
+async function contractBet(contract, epoch, direction, amount) {
+  try {
+    if (direction !== Direction.Skip) {
+      const tx = await contract["bet" + direction](epoch, {
+        value: ethers.parseEther(amount),
+      })
+      await tx.wait()
+    }
+  } catch (e) {
+    return e
+  }
+  return null
 }
 
-export default class Strategy extends Emitter {
+export default class Strategy {
   constructor(name) {
-    super()
     this.name = name
+    this.amount = 0.1
     this.Direction = Direction
-    this.Signals = GlobalSignals
-    this.signalHandlers = {}
-    this.simulate = true
-    this.criteria = undefined
+    this.criteria = {}
   }
 
-  async betAction(contract, epoch, direction, amount) {
-    const data = {
-      epoch,
-      direction,
-      amount,
-      simulate: this.simulate,
-      criteria: this.criteria,
-      error: null,
-    }
-    try {
-      if (!this.simulate && direction !== Direction.Skip) {
-        const tx = await contract["bet" + direction](epoch, {
-          value: ethers.parseEther(amount),
-        })
-        await tx.wait()
-      }
-    } catch (e) {
-      data.error = e
-    }
-    this.emitter.emit(Signals.BetAction, data)
-  }
-
-  observer() {
-    if (!(this.Signals.Round.Bet in this.signalHandlers)) {
-      this.signalHandlers[this.Signals.Round.Bet] = this.betFactory()
-    }
-    return {
-      name: this.name,
-      signals: this.signalHandlers,
-    }
-  }
-
-  run(observer) {
-    this.addObserver(observer)
-  }
-
-  stop() {
-    this.removeAllObservers()
-  }
-
-  // betFactory returns a closure to be called by the main loop's event emitter.
-  betFactory() {}
+  run(_) {}
+  stop() {}
+  bet(_) {}
 }
 
 export class TAStrategy extends Strategy {
-  constructor(name, taName) {
-    super(name)
+  constructor(name, taName, amount) {
+    super(name, amount)
     this.taName = taName
     this.betDirection = null
     this.worker = undefined
   }
 
-  run(observer) {
-    super.run(observer)
+  run(callback) {
     this.worker = new Worker(`./src/lib/ta/workers/${this.taName}.js`)
 
     this.worker.on("message", (data) => {
@@ -84,7 +49,7 @@ export class TAStrategy extends Strategy {
           : Direction.Skip
       this.betDirection = data.direction
       this.criteria = data.criteria
-      this.emitter.emit(Signals.TA, data)
+      callback(data)
     })
 
     this.worker.on("error", (e) => {
@@ -98,5 +63,57 @@ export class TAStrategy extends Strategy {
       this.worker.postMessage({ exit: true })
       this.worker = undefined
     }
+  }
+
+  bet(_) {
+    return this.betDirection
+  }
+}
+
+export class StrategyEngine {
+  constructor(strategies) {
+    this.strategies = strategies
+    this.activeName = strategies[0].name
+    this.simulate = true
+  }
+
+  run(contract, loop) {
+    loop.emitter.on(Signals.Round.Bet, (round) =>
+      this.strategies.forEach(async (s) => {
+        const direction = s.bet(round)
+        let error = null
+        let sim = true
+
+        if (!this.simulate && s.name === this.activeName) {
+          error = await contractBet(contract, round.epoch, direction, s.amount)
+          sim = false
+        }
+
+        loop.emitter.emit(Signals.Round.BetAction, {
+          strategy: s.name,
+          epoch: round.epoch,
+          direction: direction,
+          amount: s.amount,
+          criteria: s.criteria,
+          simulate: sim,
+          error: error,
+        })
+      })
+    )
+
+    this.strategies.forEach((s) =>
+      s.run((data) => {
+        if (s.name === this.activeName) {
+          loop.emitter.emit(Signals.Broadcast, {
+            strategy: s.name,
+            ...data,
+          })
+        }
+      })
+    )
+  }
+
+  stop() {
+    this.strategies.forEach((s) => s.stop())
   }
 }

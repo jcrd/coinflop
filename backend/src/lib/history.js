@@ -10,15 +10,21 @@ export default class History extends Emitter {
     this.signals = {
       [Signals.Round.BetAction]: async ({
         epoch,
+        strategy,
         direction,
         amount,
         criteria,
-      }) =>
-        (this.entries[epoch] = {
-          direction: direction,
-          amount: amount,
-          criteria: criteria,
-        }),
+      }) => {
+        if (!(epoch in this.entries)) {
+          this.entries[epoch] = { bets: [] }
+        }
+        this.entries[epoch].bets.push({
+          strategy,
+          direction,
+          amount,
+          criteria,
+        })
+      },
       [Signals.Round.Close]: async (round) => {
         const epoch = round.epoch
         const result =
@@ -26,10 +32,8 @@ export default class History extends Emitter {
         if (epoch in this.entries) {
           const entry = this.entries[epoch]
           entry.result = result
-          entry.win = result === entry.direction
+          entry.bets.forEach((bet) => (bet.win = result === bet.direction))
           this.emitter.emit("Update", { epoch: Number(epoch), ...entry })
-        } else {
-          this.entries[epoch] = { result: result }
         }
       },
     }

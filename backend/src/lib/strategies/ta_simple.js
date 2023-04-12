@@ -1,19 +1,7 @@
 import { TAStrategy } from "../strategy.js"
 
 export default class TASimple extends TAStrategy {
-  constructor(amount) {
+  constructor() {
     super("ta_simple", "simple")
-    this.amount = amount
-  }
-
-  betFactory() {
-    return async (round, contract) => {
-      await this.betAction(
-        contract,
-        round.epoch,
-        this.betDirection,
-        this.amount
-      )
-    }
   }
 }
