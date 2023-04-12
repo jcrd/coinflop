@@ -6,7 +6,9 @@ export default function (path) {
   return {
     name: "leveldb",
     signals: {
-      Update: async (entry) => await db.put(entry),
+      Update: async (entry) => {
+        await db.put(entry.epoch, entry)
+      },
     },
     load: async (limit = 50) => {
       const r = []
