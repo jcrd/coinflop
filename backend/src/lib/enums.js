@@ -23,6 +23,5 @@ export const Signals = {
       BetBear: "Round.Event.BetBear",
     },
   },
-  UseStrategy: "UseStrategy",
   Broadcast: "Broadcast",
 }

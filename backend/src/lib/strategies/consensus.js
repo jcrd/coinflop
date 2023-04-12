@@ -1,9 +1,8 @@
 import Strategy from "../strategy.js"
 
 export default class Consensus extends Strategy {
-  constructor(amount) {
+  constructor() {
     super("consensus")
-    this.amount = amount
   }
 
   getBetDirection(bull, bear, ratio = 5) {
@@ -16,14 +15,7 @@ export default class Consensus extends Strategy {
     return this.Direction.Bull
   }
 
-  betFactory() {
-    return async (round, contract) => {
-      await this.betAction(
-        contract,
-        round.epoch,
-        this.getBetDirection(round.bullAmount, round.bearAmount),
-        this.amount
-      )
-    }
+  bet(round) {
+    return this.getBetDirection(round.bullAmount, round.bearAmount)
   }
 }

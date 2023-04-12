@@ -9,20 +9,14 @@ import runWSServer from "./lib/wss.js"
 import LevelDB from "./lib/db/level.js"
 import MongoDB from "./lib/db/mongo.js"
 
-import strategies from "./lib/strategies/index.js"
+import strategyEngine from "./lib/strategies/engine.js"
 
 const BET_WINDOW = {
   AFTER_ROUND_START: 264,
   BEFORE_ROUND_LOCK: 10,
 }
-const BET_AMOUNT = "0.1"
 
 dotenv.config()
-
-function getStrategy() {
-  const arg = process.argv[2]
-  return strategies[arg] || strategies["ta_simple"]
-}
 
 const { contract, signerAddress } = Contract(
   process.env.PROVIDER_ENDPOINT,
@@ -75,6 +69,7 @@ httpServer.on("upgrade", wsServer.upgrade)
 
 process.on("SIGINT", async () => {
   console.log("Received SIGINT")
+  strategyEngine.stop()
   loop.abort()
   await db.close()
   wsServer.close()
@@ -84,8 +79,7 @@ process.on("SIGINT", async () => {
 })
 
 // Called last so signal data is queued by websocket server.
-const strategy = getStrategy()
-loop.useStrategy(new strategy(BET_AMOUNT))
+strategyEngine.run(contract, loop)
 history.load(await db.load())
 
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)

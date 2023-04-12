@@ -2,7 +2,6 @@ import { setTimeout } from "timers/promises"
 
 import Emitter from "./emitter.js"
 import { Signals } from "./enums.js"
-import { Signals as StrategySignals } from "./strategy.js"
 
 function getTimestamp() {
   return BigInt(Math.floor(Date.now() / 1000))
@@ -18,22 +17,12 @@ export default class Loop extends Emitter {
     this.controller = new AbortController()
 
     this.running = false
-    this.strategy
 
     this.emitter.on(Signals.Round.BetAction, ({ error }) => {
       if (error !== null) {
         running = false
       }
     })
-
-    this.strategyObserver = {
-      signals: {
-        [StrategySignals.BetAction]: (data) =>
-          this.emitter.emit(Signals.Round.BetAction, data),
-        [StrategySignals.TA]: (data) =>
-          this.emitter.emit(Signals.Broadcast, data),
-      },
-    }
   }
 
   async wait(seconds) {
@@ -112,35 +101,10 @@ export default class Loop extends Emitter {
     }
 
     // Get up-to-date round data.
-    this.emitter.emit(
-      Signals.Round.Bet,
-      await this.contract.rounds(epoch),
-      this.contract
-    )
+    this.emitter.emit(Signals.Round.Bet, await this.contract.rounds(epoch))
 
     await this.waitForRoundLock(round)
     return true
-  }
-
-  useStrategy(s) {
-    const setStrategy = () => {
-      if (this.strategy) {
-        this.removeObserver(this.strategy.name)
-        this.strategy.stop()
-      }
-      this.addObserver(s.observer())
-
-      this.strategy = s
-
-      this.strategy.run(this.strategyObserver)
-      this.emitter.emit(Signals.UseStrategy, this.strategy)
-    }
-
-    if (this.running) {
-      this.emitter.once(Signals.Round.Lock, setStrategy)
-    } else {
-      setStrategy()
-    }
   }
 
   async run(...window) {
@@ -155,9 +119,6 @@ export default class Loop extends Emitter {
       if (e.name != "AbortError") {
         throw e
       }
-    }
-    if (this.strategy) {
-      this.strategy.stop()
     }
   }
 
