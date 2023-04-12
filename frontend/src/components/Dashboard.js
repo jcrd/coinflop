@@ -4,7 +4,6 @@ import useWebSocket from "react-use-websocket"
 import CandleChart from "./CandleChart.js"
 import LineChart from "./LineChart.js"
 import Status from "./Status.js"
-import RoundHistory from "./RoundHistory.js"
 
 const WS_URL = `${process.env.REACT_APP_WS_URL}${
   process.env.REACT_APP_WS_PORT || ""
@@ -18,7 +17,6 @@ const Dashboard = () => {
   const [history5m, setHistory5m] = useState([])
 
   const [logMessages, setLogMessages] = useState([])
-  const [roundHistory, setRoundHistory] = useState([])
 
   const defState = { state: { up: false, down: false }, values: {} }
   const [statusData, setStatusData] = useState({
@@ -64,11 +62,6 @@ const Dashboard = () => {
         continue
       }
 
-      if (json.type === "history") {
-        concat(setRoundHistory, json)
-        continue
-      }
-
       concat(history[json.interval], {
         ...json,
         criteria: json.criteria[json.interval],
@@ -103,9 +96,6 @@ const Dashboard = () => {
           <CandleChart history={history5m} />
         </div>
         <LineChart history={history1m} />
-        <div className="col-span-2 my-auto">
-          <RoundHistory data={roundHistory} />
-        </div>
       </div>
     </div>
   )
