@@ -34,21 +34,8 @@ export default function runWSServer(loop, history, queueSize = 600) {
       },
     },
   })
+
   loop.addObserver(Logger("wsLoggerQueue", logger))
-
-  const historyQueue = (entry) =>
-    queues.history.add({ type: "history", ...entry })
-
-  history.addObserver({
-    name: "historyQueue",
-    signals: {
-      Update: (entry) => {
-        historyQueue(entry)
-        sendAll(JSON.stringify([{ type: "history", ...entry }]))
-      },
-      Load: historyQueue,
-    },
-  })
   history.addObserver(HistoryLogger("wsHistoryLoggerQueue", logger))
 
   wss.on("connection", (ws) => {
@@ -74,7 +61,6 @@ export default function runWSServer(loop, history, queueSize = 600) {
 
       loop.removeObserver("broadcastQueue")
       loop.removeObserver("wsLoggerQueue")
-      history.removeObserver("historyQueue")
       history.removeObserver("wsHistoryLoggerQueue")
 
       wss.close()
