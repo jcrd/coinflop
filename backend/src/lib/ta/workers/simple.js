@@ -1,32 +1,21 @@
-import { BollingerBands, SMA } from "@debut/indicators"
+import { BollingerBands } from "@debut/indicators"
 
 import { StochRSI } from "../indicators/stoch_rsi.js"
 import { HMA } from "../indicators/hma.js"
 
 import { KlineWorker } from "../worker.js"
 
-const indicators = {
-  1: {
-    bbands: new BollingerBands(10, 2),
-    stochRSI: new StochRSI(),
-    hma: new HMA(100),
-  },
-  3: {
-    hma: new HMA(50),
-  },
-  5: {
-    hma: new HMA(50),
-  },
+const hmaPeriod = {
+  1: 100,
+  3: 50,
+  5: 50,
 }
 
 function hmaCriteria(interval) {
   return {
     name: "hma",
-    predicate: (close) => {
-      const v = indicators[interval].hma.nextValue(close)
-      if (v === undefined) {
-        return null
-      }
+    indicator: new HMA(hmaPeriod[interval]),
+    predicate: (v, close) => {
       return {
         state: { up: close > v, down: close < v },
         values: { close, hma: v },
@@ -39,11 +28,8 @@ function hmaCriteria(interval) {
 const worker = KlineWorker([
   {
     name: "bbands",
-    predicate: (close) => {
-      const v = indicators[1].bbands.nextValue(close)
-      if (v === undefined) {
-        return null
-      }
+    indicator: new BollingerBands(10, 2),
+    predicate: (v, close) => {
       return {
         state: { up: close < v.upper, down: close > v.lower },
         values: { close, ...v },
@@ -53,12 +39,8 @@ const worker = KlineWorker([
   },
   {
     name: "stochRSI",
-    predicate: (close) => {
-      const values = indicators[1].stochRSI.nextValue(close)
-      if (values === undefined) {
-        return null
-      }
-      const { k, d } = values
+    indicator: new StochRSI(),
+    predicate: ({ k, d }, close) => {
       return {
         state: {
           up: k > d && k > 0.3 && k < 0.7,

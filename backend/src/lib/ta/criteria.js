@@ -28,12 +28,14 @@ export default function (criteria) {
     const results = {}
 
     for (const c of criteria.filter((c) => c.interval == interval)) {
-      const r = c.predicate(close)
+      const values = c.indicator.nextValue(close)
 
-      if (!r) {
+      if (values === undefined) {
         results[c.name] = { state: defState, values: {} }
         continue
       }
+
+      const r = c.predicate(values, close)
 
       results[c.name] = r
       c.state = r.state
