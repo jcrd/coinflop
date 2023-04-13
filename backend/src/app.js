@@ -38,7 +38,10 @@ let db
 switch (process.env.DATABASE) {
   case "mongo":
     console.log("Using mongodb")
-    db = await MongoDB(process.env.MONGO_URL)
+    db = await MongoDB(process.env.MONGO_URL, {
+      database: "round",
+      collection: "data",
+    })
     break
   default:
     console.log("Using leveldb")

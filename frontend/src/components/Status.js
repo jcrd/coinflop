@@ -35,11 +35,28 @@ const Status = ({ data, logMessages }) => {
   const [timestampData, setTimestampData] = useState(0)
 
   useEffect(() => {
-    setBbands1m(data[1].bbands.state)
-    setStochRSI1m(data[1].stochRSI.state)
-    setHMA1m(data[1].hma.state)
-    setHMA3m(data[3].hma.state)
-    setHMA5m(data[5].hma.state)
+    const setters = {
+      1: {
+        bbands: setBbands1m,
+        stochRSI: setStochRSI1m,
+        hma: setHMA1m,
+      },
+      3: {
+        hma: setHMA3m,
+      },
+      5: {
+        hma: setHMA5m,
+      },
+    }
+
+    for (const interval in setters) {
+      for (const name in setters[interval]) {
+        if (name in data[interval]) {
+          setters[interval][name](data[interval][name].state)
+        }
+      }
+    }
+
     setDirection(data.direction)
     setTimestampData(data.timestamp)
   }, [data])
