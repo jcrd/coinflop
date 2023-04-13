@@ -9,7 +9,6 @@ const indicators = {
   1: {
     bbands: new BollingerBands(10, 2),
     stochRSI: new StochRSI(),
-    sma: new SMA(3),
     hma: new HMA(100),
   },
   3: {
@@ -55,14 +54,11 @@ const worker = KlineWorker([
   {
     name: "stochRSI",
     predicate: (close) => {
-      const k = indicators[1].stochRSI.nextValue(close)
-      if (k === undefined) {
+      const values = indicators[1].stochRSI.nextValue(close)
+      if (values === undefined) {
         return null
       }
-      const d = indicators[1].sma.nextValue(k)
-      if (d === undefined) {
-        return null
-      }
+      const { k, d } = values
       return {
         state: {
           up: k > d && k > 0.3 && k < 0.7,
