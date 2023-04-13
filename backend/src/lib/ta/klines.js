@@ -2,16 +2,19 @@ import WebSocket from "ws"
 
 import Emitter from "../emitter.js"
 
-const limits = {
-  1: 200,
-  3: 100,
-  5: 100,
+const restLimit = 201
+
+function getFormat(interval) {
+  return interval === 60 ? "1h" : interval + "m"
 }
 
 const API = {
-  ws: (interval) => `wss://stream.binance.us:9443/ws/bnbusd@kline_${interval}m`,
+  ws: (interval) =>
+    `wss://stream.binance.us:9443/ws/bnbusd@kline_${getFormat(interval)}`,
   rest: (interval) => {
-    return `https://api.binance.us/api/v3/klines?symbol=BNBUSD&limit=${limits[interval]}&interval=${interval}m`
+    return `https://api.binance.us/api/v3/klines?symbol=BNBUSD&limit=${restLimit}&interval=${getFormat(
+      interval
+    )}`
   },
 }
 

@@ -70,7 +70,7 @@ const Chart = ({ history }) => {
   define({
     name: "hmaData",
     state: useState([]),
-    cond: (v) => "hma" in v.criteria.hma.values,
+    cond: (v) => "hma" in v.criteria,
     transform: (v) => ({
       x: new Date(v.closeTime),
       y: parseFloat(v.criteria.hma.values.hma),

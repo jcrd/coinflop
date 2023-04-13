@@ -5,7 +5,7 @@ import { newFixedArray } from "./utils.js"
 
 import { Logger, HistoryLogger } from "./logger.js"
 
-export default function runWSServer(loop, history, queueSize = 600) {
+export default function runWSServer(loop, history, queueSize = 10000) {
   const wss = new WebSocketServer({ noServer: true })
 
   const queues = {

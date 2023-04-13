@@ -62,10 +62,12 @@ const Dashboard = () => {
         continue
       }
 
-      concat(history[json.interval], {
-        ...json,
-        criteria: json.criteria[json.interval],
-      })
+      if (json.interval in history) {
+        concat(history[json.interval], {
+          ...json,
+          criteria: json.criteria[json.interval],
+        })
+      }
 
       setStatusData({
         direction: json.direction,
