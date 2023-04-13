@@ -43,8 +43,8 @@ const worker = KlineWorker([
     predicate: ({ k, d }, close) => {
       return {
         state: {
-          up: k > d && k > 0.3 && k < 0.7,
-          down: k < d && k > 0.3 && k < 0.7,
+          up: k > d && k > 30 && k < 70,
+          down: k < d && k > 30 && k < 70,
         },
         values: { close, k, d },
       }
