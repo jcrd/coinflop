@@ -30,8 +30,8 @@ export default class Strategy {
 }
 
 export class TAStrategy extends Strategy {
-  constructor(name, taName, amount) {
-    super(name, amount)
+  constructor(name, taName) {
+    super(name)
     this.taName = taName
     this.betDirection = null
     this.worker = undefined
