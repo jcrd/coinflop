@@ -19,7 +19,7 @@ export class StochRSI {
       if (d === undefined) {
         return undefined
       }
-      return { k, d }
+      return { k: k * 100, d: d * 100 }
     }
     return undefined
   }
