@@ -35,7 +35,7 @@ export default class Dumb extends HistoryStrategy {
     // Bet is skipped, and historyRound becomes false (round 2).
     // Bet is placed, and historyRound becomes true (round 3).
     if (!this.ready || this.historyRound) {
-      return this.Direction.Skip
+      return { direction: this.Direction.Skip }
     }
     const lastResult = this.history[this.history.length - 1].result
     const rate = this.getChangeRate()
