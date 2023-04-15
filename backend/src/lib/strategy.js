@@ -20,7 +20,6 @@ export default class Strategy {
   constructor(name) {
     this.name = name
     this.amount = 0.1
-    this.criteria = {}
     this.Direction = Direction
   }
 
@@ -52,6 +51,7 @@ export class TAStrategy extends Strategy {
     super(name)
     this.taName = taName
     this.betDirection = null
+    this.criteria = {}
     this.worker = undefined
   }
 
@@ -84,7 +84,7 @@ export class TAStrategy extends Strategy {
   }
 
   bet(_) {
-    return this.betDirection
+    return { direction: this.betDirection, criteria: this.criteria }
   }
 }
 
@@ -98,7 +98,7 @@ export class StrategyEngine {
   run(contract, loop, history) {
     loop.emitter.on(Signals.Round.Bet, (round) =>
       this.strategies.forEach(async (s) => {
-        const direction = s.bet(round)
+        const { direction, criteria } = s.bet(round)
         let error = null
         let sim = true
 
@@ -112,7 +112,7 @@ export class StrategyEngine {
           epoch: round.epoch,
           direction: direction,
           amount: s.amount,
-          criteria: s.criteria,
+          criteria: criteria,
           simulate: sim,
           error: error,
         })
