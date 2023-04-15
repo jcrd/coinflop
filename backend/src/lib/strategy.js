@@ -112,7 +112,7 @@ export class StrategyEngine {
           epoch: round.epoch,
           direction: direction,
           amount: s.amount,
-          criteria: criteria,
+          criteria: criteria || {},
           simulate: sim,
           error: error,
         })
