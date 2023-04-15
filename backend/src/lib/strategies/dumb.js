@@ -4,22 +4,30 @@ import { newFixedArray } from "../utils.js"
 export default class Dumb extends HistoryStrategy {
   constructor(period = 12) {
     super("dumb")
-    this.ready = false
-    this.historyRound = false
-    this.history = newFixedArray(period)
+    this.histories = [
+      {
+        ready: false,
+        entries: newFixedArray(period),
+      },
+      {
+        ready: false,
+        entries: newFixedArray(period),
+      },
+    ]
     this.historyCallback = (round) => {
-      // Round.Close signal comes after Round.Bet, so this determines if a bet is made in the *next* round.
-      this.historyRound = !this.historyRound
-      if (this.historyRound) {
-        this.ready = history.add(round)
-      }
+      const history = this.getHistory(round.epoch)
+      history.ready = history.entries.add(round)
     }
   }
 
-  getChangeRate() {
-    let lastResult = this.history[0].result
+  getHistory(epoch) {
+    return this.histories[epoch % BigInt(2)]
+  }
 
-    const changes = this.history.reduce((count, entry) => {
+  getChangeRate(entries) {
+    let lastResult = entries[0].result
+
+    const changes = entries.reduce((count, entry) => {
       if (entry.result !== lastResult) {
         count++
       }
@@ -27,18 +35,16 @@ export default class Dumb extends HistoryStrategy {
       return count
     }, 0)
 
-    return Math.round((changes / (this.history.length - 1)) * 100)
+    return Math.round((changes / (entries.length - 1)) * 100)
   }
 
-  bet(_) {
-    // Round history is received, and historyRound becomes true (round 1).
-    // Bet is skipped, and historyRound becomes false (round 2).
-    // Bet is placed, and historyRound becomes true (round 3).
-    if (!this.ready || this.historyRound) {
+  bet(round) {
+    const history = this.getHistory(round.epoch)
+    if (!history.ready) {
       return { direction: this.Direction.Skip }
     }
-    const lastResult = this.history[this.history.length - 1].result
-    const rate = this.getChangeRate()
+    const lastResult = history.entries[history.entries.length - 1].result
+    const rate = this.getChangeRate(history.entries)
     return {
       direction:
         rate < 60
