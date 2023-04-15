@@ -38,10 +38,15 @@ export default class Dumb extends HistoryStrategy {
       return this.Direction.Skip
     }
     const lastResult = this.history[this.history.length - 1].result
-    return this.getChangeRate() < 60
-      ? lastResult
-      : lastResult === this.Direction.Bull
-      ? this.Direction.Bear
-      : this.Direction.Bull
+    const rate = this.getChangeRate()
+    return {
+      direction:
+        rate < 60
+          ? lastResult
+          : lastResult === this.Direction.Bull
+          ? this.Direction.Bear
+          : this.Direction.Bull,
+      criteria: { rate },
+    }
   }
 }
