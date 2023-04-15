@@ -20,13 +20,31 @@ export default class Strategy {
   constructor(name) {
     this.name = name
     this.amount = 0.1
-    this.Direction = Direction
     this.criteria = {}
+    this.Direction = Direction
   }
 
   run(_) {}
   stop() {}
   bet(_) {}
+  observer() {}
+}
+
+export class HistoryStrategy extends Strategy {
+  constructor(name) {
+    super(name)
+    this.historyCallback = undefined
+  }
+
+  observer() {
+    return this.historyCallback === undefined
+      ? undefined
+      : {
+          signals: {
+            Update: (entry) => this.historyCallback(entry),
+          },
+        }
+  }
 }
 
 export class TAStrategy extends Strategy {
@@ -77,7 +95,7 @@ export class StrategyEngine {
     this.simulate = true
   }
 
-  run(contract, loop) {
+  run(contract, loop, history) {
     loop.emitter.on(Signals.Round.Bet, (round) =>
       this.strategies.forEach(async (s) => {
         const direction = s.bet(round)
@@ -101,7 +119,11 @@ export class StrategyEngine {
       })
     )
 
-    this.strategies.forEach((s) =>
+    this.strategies.forEach((s) => {
+      const obs = s.observer()
+      if (obs !== undefined && s instanceof HistoryStrategy) {
+        history.addObserver(obs)
+      }
       s.run((data) => {
         if (s.name === this.activeName) {
           loop.emitter.emit(Signals.Broadcast, {
@@ -110,7 +132,7 @@ export class StrategyEngine {
           })
         }
       })
-    )
+    })
   }
 
   stop() {
