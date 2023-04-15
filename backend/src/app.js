@@ -82,7 +82,7 @@ process.on("SIGINT", async () => {
 })
 
 // Called last so signal data is queued by websocket server.
-strategyEngine.run(contract, loop)
+strategyEngine.run(contract, loop, history)
 history.load(await db.load())
 
 await loop.run(BET_WINDOW.AFTER_ROUND_START, BET_WINDOW.BEFORE_ROUND_LOCK)
