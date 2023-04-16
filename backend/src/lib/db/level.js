@@ -7,7 +7,10 @@ export default function (path) {
     name: "leveldb",
     signals: {
       Update: async (entry) => {
-        await db.put(entry.epoch, entry)
+        await db.put(Number(entry.epoch), {
+          ...entry,
+          epoch: Number(entry.epoch),
+        })
       },
     },
     load: async (limit = 50) => {
