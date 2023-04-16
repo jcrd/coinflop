@@ -18,7 +18,10 @@ export default class Consensus extends Strategy {
   bet(round) {
     return {
       direction: this.getBetDirection(round.bullAmount, round.bearAmount),
-      criteria: { bull: round.bullAmount, bear: round.bearAmount },
+      criteria: {
+        bull: Number(round.bullAmount),
+        bear: Number(round.bearAmount),
+      },
     }
   }
 }
