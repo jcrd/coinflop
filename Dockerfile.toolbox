@@ -1,1 +1,13 @@
 FROM supplantr/javascript-toolbox
+
+# https://stackoverflow.com/a/72585989/1200868
+RUN echo '\
+[Mongodb]\n\
+name=MongoDB Repository\n\
+baseurl=https://repo.mongodb.org/yum/amazon/2/mongodb-org/6.0/x86_64/\n\
+gpgcheck=1\n\
+enabled=1\n\
+gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc' > /etc/yum.repos.d/mongodb.repo
+
+RUN dnf copr enable -y dioni21/compat-openssl10
+RUN dnf install -y mongodb-org
