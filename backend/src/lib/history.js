@@ -27,7 +27,15 @@ export default class History extends Emitter {
           const entry = this.entries[epoch]
           entry.result = result
           entry.win = result === entry.direction
-          this.emitter.emit("Update", { epoch: Number(epoch), ...entry })
+          this.emitter.emit("Update", {
+            epoch: Number(epoch),
+            timestamp: {
+              start: Number(round.startTimestamp),
+              lock: Number(round.lockTimestamp),
+              close: Number(round.closeTimestamp),
+            },
+            ...entry,
+          })
         } else {
           this.entries[epoch] = { result: result }
         }
