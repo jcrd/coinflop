@@ -56,7 +56,9 @@ export class TAStrategy extends Strategy {
   }
 
   run(callback) {
-    this.worker = new Worker(`./src/lib/ta/workers/${this.taName}.js`)
+    this.worker = new Worker(`./src/lib/ta/workers/${this.taName}.js`, {
+      workerData: process.env.PREDICTION_URL,
+    })
 
     this.worker.on("message", (data) => {
       data.direction =
