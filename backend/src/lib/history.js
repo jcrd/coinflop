@@ -34,7 +34,7 @@ export default class History extends Emitter {
           entry.result = result
           entry.bets.forEach((bet) => (bet.win = result === bet.direction))
           this.emitter.emit("Update", {
-            epoch,
+            epoch: Number(epoch),
             timestamp: {
               start: Number(round.startTimestamp),
               lock: Number(round.lockTimestamp),
