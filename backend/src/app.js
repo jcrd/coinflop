@@ -40,7 +40,7 @@ switch (process.env.DATABASE) {
     console.log("Using mongodb")
     db = await MongoDB(process.env.MONGO_URL, {
       database: "round",
-      collection: "data",
+      collection: "predict",
     })
     break
   default:
