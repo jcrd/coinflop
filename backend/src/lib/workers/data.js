@@ -1,8 +1,8 @@
 import { BollingerBands, SMA, MACD, RSI } from "@debut/indicators"
 
-import { StochRSI } from "../indicators/stoch_rsi.js"
+import { StochRSI } from "../ta/indicators/stoch_rsi.js"
 
-import { KlineWorker } from "../worker.js"
+import { KlineWorker } from "../ta/worker.js"
 
 function genSMA(interval) {
   return [10, 20, 30, 50, 100, 200].map((period) => ({

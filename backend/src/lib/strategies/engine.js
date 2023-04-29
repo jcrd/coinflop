@@ -1,3 +1,5 @@
-import { StrategyEngine, TAStrategy } from "../strategy.js"
+import { StrategyEngine, WorkerStrategy } from "../strategy.js"
 
-export default new StrategyEngine([new TAStrategy("prediction", "predictor")])
+export default new StrategyEngine([
+  new WorkerStrategy("prediction", "predictor"),
+])
