@@ -9,14 +9,12 @@ import runWSServer from "./lib/wss.js"
 import LevelDB from "./lib/db/level.js"
 import MongoDB from "./lib/db/mongo.js"
 
-import strategyEngine from "./lib/strategies/engine.js"
+import strategyEngine from "./lib/engine.js"
 
 const BET_WINDOW = {
   AFTER_ROUND_START: 264,
   BEFORE_ROUND_LOCK: 10,
 }
-
-dotenv.config()
 
 const { contract, signerAddress } = Contract(
   process.env.PROVIDER_ENDPOINT,

@@ -1,8 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "start": "node src/app.js",
-    "with-frontend": "WITH_FRONTEND=true node src/app.js",
+    "start": "node -r dotenv/config src/app.js",
+    "with-frontend": "WITH_FRONTEND=true node -r dotenv/config src/app.js",
     "aggregation": "node scripts/aggregation.js"
   },
   "dependencies": {

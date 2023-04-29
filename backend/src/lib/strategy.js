@@ -55,9 +55,9 @@ export class WorkerStrategy extends Strategy {
     this.worker = undefined
   }
 
-  run(callback) {
+  run(callback, data = undefined) {
     this.worker = new Worker(`./src/lib/workers/${this.workerName}.js`, {
-      workerData: process.env.PREDICTION_URL,
+      workerData: data,
     })
 
     this.worker.on("message", (data) => {
@@ -90,6 +90,35 @@ export class WorkerStrategy extends Strategy {
   }
 }
 
+export class PredictStreamStrategy extends WorkerStrategy {
+  constructor(name, model, workerName) {
+    super(name, workerName)
+    this.url = `${process.env.PREDICTION_STREAM_URL}/${model}`
+  }
+
+  run(callback) {
+    super.run(callback, this.url)
+  }
+}
+
+export class PredictQueryStrategy extends Strategy {
+  constructor(name, model, moment) {
+    super(name)
+    this.url = `${process.env.PREDICTION_QUERY_URL}/${model}?moment=${moment}`
+  }
+
+  async bet(_) {
+    const resp = await fetch(this.url)
+    const json = await resp.json()
+    const p = json.prediction === "1" ? Direction.Bull : Direction.Bear
+    delete json.prediction
+    return {
+      direction: p,
+      criteria: json,
+    }
+  }
+}
+
 export class StrategyEngine {
   constructor(strategies) {
     this.strategies = strategies
@@ -100,7 +129,7 @@ export class StrategyEngine {
   run(contract, loop, history) {
     loop.emitter.on(Signals.Round.Bet, (round) =>
       this.strategies.forEach(async (s) => {
-        const { direction, criteria } = s.bet(round)
+        const { direction, criteria } = await s.bet(round)
         let error = null
         let sim = true
 
