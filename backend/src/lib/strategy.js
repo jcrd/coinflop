@@ -91,8 +91,9 @@ export class WorkerStrategy extends Strategy {
 }
 
 export class PredictStreamStrategy extends WorkerStrategy {
-  constructor(name, model, workerName) {
-    super(name, workerName)
+  constructor({ type, interval, horizon }, workerName) {
+    const model = [type, interval, horizon].join("_")
+    super(["predict", "stream", model].join("_"), workerName)
     this.url = `${process.env.PREDICTION_STREAM_URL}/${model}`
   }
 
@@ -102,8 +103,13 @@ export class PredictStreamStrategy extends WorkerStrategy {
 }
 
 export class PredictQueryStrategy extends Strategy {
-  constructor(name, model, moment) {
-    super(name)
+  constructor({ type, interval, horizon }, moment) {
+    const model = [type, interval, horizon].join("_")
+    const name = ["predict", "query", model]
+    if (moment) {
+      name.push("moment")
+    }
+    super(name.join("_"))
     this.url = `${process.env.PREDICTION_QUERY_URL}/${model}?moment=${moment}`
   }
 
