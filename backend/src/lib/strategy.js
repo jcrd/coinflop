@@ -46,17 +46,17 @@ export class HistoryStrategy extends Strategy {
   }
 }
 
-export class TAStrategy extends Strategy {
-  constructor(name, taName) {
+export class WorkerStrategy extends Strategy {
+  constructor(name, workerName) {
     super(name)
-    this.taName = taName
+    this.workerName = workerName
     this.betDirection = null
     this.criteria = {}
     this.worker = undefined
   }
 
   run(callback) {
-    this.worker = new Worker(`./src/lib/ta/workers/${this.taName}.js`, {
+    this.worker = new Worker(`./src/lib/workers/${this.workerName}.js`, {
       workerData: process.env.PREDICTION_URL,
     })
 
@@ -73,7 +73,7 @@ export class TAStrategy extends Strategy {
     })
 
     this.worker.on("error", (e) => {
-      console.log(`ta error: ${this.taName}: ${e}`)
+      console.log(`worker error: ${this.workerName}: ${e}`)
     })
   }
 

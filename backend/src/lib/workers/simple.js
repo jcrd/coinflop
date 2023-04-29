@@ -1,9 +1,9 @@
 import { BollingerBands } from "@debut/indicators"
 
-import { StochRSI } from "../indicators/stoch_rsi.js"
-import { HMA } from "../indicators/hma.js"
+import { StochRSI } from "../ta/indicators/stoch_rsi.js"
+import { HMA } from "../ta/indicators/hma.js"
 
-import { KlineWorker } from "../worker.js"
+import { KlineWorker } from "../ta/worker.js"
 
 const hmaPeriod = {
   1: 100,
