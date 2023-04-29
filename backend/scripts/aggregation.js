@@ -3,6 +3,9 @@ import { MongoClient } from "mongodb"
 
 import { Direction } from "../src/lib/enums.js"
 
+const database = process.env.MONGO_DATABASE
+const collection = process.env.MONGO_COLLECTION
+
 function addTACount(data, strategyName, interval, name) {
   const strat = strategyName in data ? data[strategyName] : {}
   const d = interval in strat ? strat[interval] : {}
@@ -31,7 +34,7 @@ function calcPercent(data, rounds) {
 }
 
 const functions = {
-  data_accuracy: async (database, collection) => {
+  data_accuracy: async () => {
     let rounds = 0
     const data = {}
 
@@ -71,7 +74,7 @@ await client.connect()
 const arg = process.argv[2] || "data_accuracy"
 
 if (arg in functions) {
-  console.log(arg, await functions[arg]("round", "data"))
+  console.log(arg, await functions[arg]())
 } else {
   console.log(`Bad argument: ${arg}`)
 }

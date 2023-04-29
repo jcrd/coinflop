@@ -3,6 +3,9 @@ import { MongoClient } from "mongodb"
 
 dotenv.config()
 
+const database = process.env.MONGO_DATABASE
+const collection = process.env.MONGO_COLLECTION
+
 if (process.env.DEST_MONGO_URL === undefined) {
   console.log("DEST_MONGO_URL undefined")
   process.exit(1)
@@ -21,12 +24,12 @@ process.on("SIGINT", async () => {
 })
 
 await srcClient
-  .db("round")
-  .collection("history")
+  .db(database)
+  .collection(collection)
   .find()
   .forEach(
     async (entry) =>
-      await destClient.db("round").collection("history").insertOne(entry)
+      await destClient.db(database).collection(collection).insertOne(entry)
   )
 
 await destClient.close()
