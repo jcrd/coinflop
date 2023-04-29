@@ -37,8 +37,8 @@ switch (process.env.DATABASE) {
   case "mongo":
     console.log("Using mongodb")
     db = await MongoDB(process.env.MONGO_URL, {
-      database: "round",
-      collection: "predict",
+      database: process.env.MONGO_DATABASE,
+      collection: process.env.MONGO_COLLECTION,
     })
     break
   default:

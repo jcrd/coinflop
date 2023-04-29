@@ -3,8 +3,8 @@ import dotenv from "dotenv"
 import { MongoClient } from "mongodb"
 import * as csv from "csv"
 
-const database = "round"
-const collection = "history"
+const database = process.env.MONGO_DATABASE
+const collection = process.env.MONGO_COLLECTION
 
 const fullColumns = [
   "bbUpper",
