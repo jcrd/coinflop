@@ -3,7 +3,7 @@
   "scripts": {
     "start": "node -r dotenv/config src/app.js",
     "with-frontend": "WITH_FRONTEND=true node -r dotenv/config src/app.js",
-    "aggregation": "node scripts/aggregation.js",
+    "aggregate": "node scripts/aggregate.js",
     "migrate": "npx east --es-modules --migration-extension mjs migrate"
   },
   "dependencies": {
