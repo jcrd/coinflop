@@ -3,6 +3,8 @@ import { MongoClient } from "mongodb"
 
 import { Direction } from "../src/lib/enums.js"
 
+dotenv.config()
+
 const database = process.env.MONGO_DATABASE
 const collection = process.env.MONGO_COLLECTION
 
@@ -65,8 +67,6 @@ const functions = {
     return { rounds, ...calcPercent(data, rounds) }
   },
 }
-
-dotenv.config()
 
 const client = new MongoClient(process.env.MONGO_URL)
 await client.connect()
