@@ -40,6 +40,7 @@ export default class History extends Emitter {
               lock: Number(round.lockTimestamp),
               close: Number(round.closeTimestamp),
             },
+            close: Number((round.closePrice * 100n) / BigInt(10 ** 8)) / 100,
             ...entry,
           })
         }
