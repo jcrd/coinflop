@@ -3,6 +3,8 @@ import dotenv from "dotenv"
 import { MongoClient } from "mongodb"
 import * as csv from "csv"
 
+dotenv.config()
+
 const database = process.env.MONGO_DATABASE
 const collection = process.env.MONGO_COLLECTION
 
@@ -19,7 +21,7 @@ const fullColumns = [
 ]
 
 function resultBinary(r) {
-  return r === "Bull" ? 1 : 0
+  return r === "Bull" ? 1 : -1
 }
 
 const files = {
@@ -42,12 +44,36 @@ const files = {
       ]
     },
   },
-  epoch: {
-    stringify: csv.stringify({ header: true, columns: ["epoch", "result"] }),
+  round: {
+    stringify: csv.stringify({
+      header: true,
+      columns: [
+        "epoch",
+        "startTimestamp",
+        "lockTimestamp",
+        "closeTimestamp",
+        "lockPrice",
+        "closePrice",
+        "result",
+      ],
+    }),
     stream: fs.createWriteStream(
-      `data/mongodb_${database}_${collection}_epoch.csv`
+      `data/mongodb_${database}_${collection}_round.csv`
     ),
-    process: (entry) => [entry.epoch, resultBinary(entry.result)],
+    process: (entry) => {
+      if (!("timestamp" in entry)) {
+        return
+      }
+      return [
+        entry.epoch,
+        entry.timestamp.start,
+        entry.timestamp.lock,
+        entry.timestamp.close,
+        entry.lockPrice,
+        entry.closePrice,
+        resultBinary(entry.result),
+      ]
+    },
   },
 }
 
@@ -58,7 +84,10 @@ async function write() {
     .find()
     .forEach((entry) => {
       for (const f of Object.values(files)) {
-        f.stringify.write(f.process(entry))
+        const p = f.process(entry)
+        if (p !== undefined) {
+          f.stringify.write(p)
+        }
       }
     })
 
@@ -75,8 +104,6 @@ async function write() {
     }
   })
 }
-
-dotenv.config()
 
 const client = new MongoClient(process.env.MONGO_URL)
 await client.connect()
