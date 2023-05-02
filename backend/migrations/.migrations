@@ -1,3 +1,5 @@
 [
-    "1_addTimestamps"
+    "1_castEpochNumber",
+    "2_addTimestamps",
+    "3_addCloseAndLock"
 ]
