@@ -2,6 +2,10 @@ import { Worker } from "worker_threads"
 
 import { Direction, Signals } from "./enums.js"
 
+const Observer = {
+  History: "History",
+}
+
 async function contractBet(contract, epoch, direction, amount) {
   try {
     if (direction !== Direction.Skip) {
@@ -21,28 +25,23 @@ export default class Strategy {
     this.name = name
     this.amount = 0.1
     this.Direction = Direction
+    this.historyCallback = undefined
   }
 
   run(_) {}
   stop() {}
   bet(_) {}
-  observer() {}
-}
-
-export class HistoryStrategy extends Strategy {
-  constructor(name) {
-    super(name)
-    this.historyCallback = undefined
-  }
-
-  observer() {
-    return this.historyCallback === undefined
-      ? undefined
-      : {
-          signals: {
-            Update: (entry) => this.historyCallback(entry),
-          },
-        }
+  observer(type) {
+    switch (type) {
+      case Observer.History:
+        return this.historyCallback === undefined
+          ? undefined
+          : {
+              signals: {
+                Update: (entry) => this.historyCallback(entry),
+              },
+            }
+    }
   }
 }
 
@@ -157,8 +156,8 @@ export class StrategyEngine {
     )
 
     this.strategies.forEach((s) => {
-      const obs = s.observer()
-      if (obs !== undefined && s instanceof HistoryStrategy) {
+      const obs = s.observer(Observer.History)
+      if (obs !== undefined) {
         history.addObserver(obs)
       }
       s.run((data) => {
