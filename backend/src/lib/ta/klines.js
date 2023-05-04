@@ -1,21 +1,20 @@
-import WebSocket from "ws"
+import { Console } from "console"
+
+import { Spot, WebsocketStream } from "@binance/connector"
 
 import Emitter from "../emitter.js"
 
+const API = {
+  ws: "wss://stream.binance.us:9443",
+  spot: "https://api.binance.us",
+}
+const klineSymbol = "bnbusd"
 const restLimit = 201
+
+const logger = new Console({ stdout: process.stdout, stderr: process.stderr })
 
 function getFormat(interval) {
   return interval === 60 ? "1h" : interval + "m"
-}
-
-const API = {
-  ws: (interval) =>
-    `wss://stream.binance.us:9443/ws/bnbusd@kline_${getFormat(interval)}`,
-  rest: (interval) => {
-    return `https://api.binance.us/api/v3/klines?symbol=BNBUSD&limit=${restLimit}&interval=${getFormat(
-      interval
-    )}`
-  },
 }
 
 function normalizeRest(json) {
@@ -54,26 +53,6 @@ export default class Kline extends Emitter {
   constructor() {
     super()
     this.websockets = {}
-    this.activeKlines = {}
-  }
-
-  onHeartbeat(ws, interval) {
-    let pingTimeout
-
-    function heartbeat() {
-      clearTimeout(pingTimeout)
-
-      pingTimeout = setTimeout(async () => {
-        ws.terminate()
-        delete this.websockets[interval]
-        await this.subscribe(interval, false)
-      }, 3 * 60 * 1000 + 30 * 1000)
-    }
-
-    ws.on("error", console.error)
-    ws.on("open", heartbeat)
-    ws.on("ping", heartbeat)
-    ws.on("close", () => clearTimeout(pingTimeout))
   }
 
   async subscribe(interval, historical = true) {
@@ -81,35 +60,42 @@ export default class Kline extends Emitter {
       return
     }
 
-    this.websockets[interval] = new WebSocket(API.ws(interval))
+    const callbacks = {
+      message: (data) => {
+        data = JSON.parse(data)
+        // True if this message marks kline close.
+        if (data.k.x) {
+          this.emitter.emit("Update", interval, normalizeWs(data))
+        }
+      },
+    }
+
+    const ws = new WebsocketStream({
+      wsURL: API.ws,
+      logger,
+      callbacks,
+    })
+    this.websockets[interval] = ws
+
+    const intervalFormat = getFormat(interval)
+
+    ws.kline(klineSymbol, intervalFormat)
 
     if (historical) {
+      const spot = new Spot("", "", { baseURL: API.spot })
       try {
-        const resp = await fetch(API.rest(interval))
-        const json = await resp.json()
-        for (const j of json) {
-          this.emitter.emit("Update", interval, normalizeRest(j))
+        const data = (
+          await spot.klines(klineSymbol, intervalFormat, {
+            limit: restLimit,
+          })
+        ).data
+        for (const d of data) {
+          this.emitter.emit("Update", interval, normalizeRest(d))
         }
       } catch (e) {
         console.log(e)
       }
     }
-
-    this.onHeartbeat(this.websockets[interval], interval)
-
-    const onMessage = (data) => {
-      data = normalizeWs(JSON.parse(data))
-
-      if (
-        interval in this.activeKlines &&
-        data.openTime != this.activeKlines[interval].openTime
-      ) {
-        this.emitter.emit("Update", interval, this.activeKlines[interval])
-      }
-      this.activeKlines[interval] = data
-    }
-
-    this.websockets[interval].on("message", onMessage)
   }
 
   close() {
