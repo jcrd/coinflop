@@ -1,4 +1,3 @@
-import dotenv from "dotenv"
 import express from "express"
 
 import Contract from "./lib/contract.js"
