@@ -47,6 +47,9 @@ const functions = {
       .forEach((entry) => {
         const state = entry.result === Direction.Bull ? "up" : "down"
         entry.bets.forEach((bet) => {
+          if (bet.strategy !== "ta_data") {
+            return
+          }
           if (Object.keys(bet.criteria).length === 0) {
             if (bet.direction === entry.result) {
               addCount(data, bet.strategy)
