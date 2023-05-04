@@ -1,7 +1,7 @@
-import { HistoryStrategy } from "../strategy.js"
+import Strategy from "../strategy.js"
 import { newFixedArray } from "../utils.js"
 
-export default class Dumb extends HistoryStrategy {
+export default class Dumb extends Strategy {
   constructor(period = 12) {
     super("dumb")
     this.histories = [
