@@ -2,6 +2,7 @@
   "type": "module",
   "scripts": {
     "start": "node -r dotenv/config src/app.js",
+    "test": "npx mocha --recursive",
     "with-frontend": "WITH_FRONTEND=true node -r dotenv/config src/app.js",
     "aggregate": "node scripts/aggregate.js",
     "generate": "node scripts/generate_csv.js",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "csv": "^6.2.10",
-    "east": "^2.0.3"
+    "east": "^2.0.3",
+    "mocha": "^10.2.0"
   }
 }

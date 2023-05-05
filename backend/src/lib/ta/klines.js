@@ -9,7 +9,7 @@ const API = {
   spot: "https://api.binance.us",
 }
 const klineSymbol = "bnbusd"
-const restLimit = 201
+const restLimit = 1000
 
 const logger = new Console({ stdout: process.stdout, stderr: process.stderr })
 
