@@ -2,7 +2,7 @@ import express from "express"
 
 import Contract from "./lib/contract.js"
 import Loop from "./lib/loop.js"
-import { Logger, HistoryLogger } from "./lib/logger.js"
+import { Logger, HistoryLogger, BroadcastLogger } from "./lib/logger.js"
 import History from "./lib/history.js"
 import runWSServer from "./lib/wss.js"
 import LevelDB from "./lib/db/level.js"
@@ -26,6 +26,10 @@ history.addObserver(HistoryLogger())
 const loop = new Loop(contract, signerAddress)
 loop.addObserver(history.observer())
 loop.addObserver(Logger())
+
+if (process.env.LOG_BROADCASTS) {
+  loop.addObserver(BroadcastLogger())
+}
 
 const wsServer = runWSServer(loop, history)
 const app = express()

@@ -68,6 +68,15 @@ export function Logger(name = "logger", func = console.log) {
   }
 }
 
+export function BroadcastLogger(name = "BroadcastLogger", func = console.log) {
+  return {
+    name,
+    signals: {
+      [Signals.Broadcast]: (data) => func(JSON.stringify(data, null, 2)),
+    },
+  }
+}
+
 export function HistoryLogger(name = "historyLogger", func = console.log) {
   const signals = {
     Update: (entry) => {
