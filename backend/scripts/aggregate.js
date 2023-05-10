@@ -35,10 +35,19 @@ function calcPercent(data, rounds) {
   return data
 }
 
+function calcRoundsWonPercent(data) {
+  for (const [_, value] of Object.entries(data)) {
+    value.accuracy = Math.round((value.roundsWon / value.roundsBet) * 100)
+  }
+
+  return data
+}
+
 const functions = {
   data_accuracy: async () => {
     let rounds = 0
     const data = {}
+    const betData = {}
 
     await client
       .db(database)
@@ -63,11 +72,25 @@ const functions = {
               }
             }
           }
+          if (!(bet.strategy in betData)) {
+            betData[bet.strategy] = { roundsBet: 0, roundsWon: 0 }
+          }
+          const d = betData[bet.strategy]
+          if (bet.direction !== "Skip") {
+            d.roundsBet += 1
+          }
+          if (bet.direction === entry.result) {
+            d.roundsWon += 1
+          }
         })
         rounds++
       })
 
-    return { rounds, ...calcPercent(data, rounds) }
+    return {
+      rounds,
+      ...calcPercent(data, rounds),
+      betAccuracy: calcRoundsWonPercent(betData),
+    }
   },
 }
 
